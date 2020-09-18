@@ -4,7 +4,8 @@ import json
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from .models import Product
+from .models import Product, OrderProduct, Order
+from foodcartapp.serializers import OrderSerializer, OrderProductSerializer
 
 
 def banners_list_api(request):
@@ -61,11 +62,21 @@ def product_list_api(request):
 
 @api_view(['POST'])
 def register_order(request):
-    try:
-        data = json.loads(request.body.decode())
-        print(data)
-    except ValueError:
-        return JsonResponse({
-            'error': 'bla bla bla',
-        })
-    return Response()
+    serializer = OrderSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+
+    order = Order.objects.create(
+        firstname=serializer.validated_data['firstname'],
+        lastname=serializer.validated_data['lastname'],
+        phonenumber=serializer.validated_data['phonenumber'],
+        address=serializer.validated_data['address'],
+    )
+
+    products_in_order = serializer.validated_data['products']
+    products = [OrderProduct(order=order, **fields) for fields in products_in_order]
+    OrderProduct.objects.bulk_create(products)
+
+    created_order = Order.objects.get(pk=order.pk)
+    serializer = OrderSerializer(created_order)
+
+    return Response(serializer.data, status=201)
