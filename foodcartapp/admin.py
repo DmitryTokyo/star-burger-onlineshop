@@ -3,6 +3,7 @@ from django.utils.html import format_html
 from django.shortcuts import reverse
 
 from .models import Restaurant, Product, RestaurantMenuItem, ProductCategory
+from foodcartapp.models import Order, OrderProduct
 
 
 class RestaurantMenuItemInline(admin.TabularInline):
@@ -100,3 +101,13 @@ class ProductAdmin(admin.ModelAdmin):
 @admin.register(ProductCategory)
 class ProductAdmin(admin.ModelAdmin):
     pass
+
+class OrderProductInline(admin.TabularInline):
+    model = OrderProduct
+    fields = ('product', 'quantity')
+
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    inlines = [
+        OrderProductInline
+    ]
