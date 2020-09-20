@@ -105,11 +105,11 @@ class ProductAdmin(admin.ModelAdmin):
 
 class OrderProductInline(admin.TabularInline):
     model = OrderProduct
-    fields = ('product', 'quantity', 'payment')
+    fields = ['product', 'quantity', 'payment']
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-
+    fields = ['order_status', 'firstname', 'lastname', 'phonenumber', 'address', 'comment']
     def response_change(self, request, obj):
         res = super(OrderAdmin, self).response_change(request, obj)
         if "next" in request.GET:
