@@ -106,6 +106,7 @@ def view_orders(request):
     for order in orders:
         order_items.append({
             'id': order.id,
+            'status': order.get_order_status_display(),
             'firstname': order.firstname,
             'lastname': order.lastname,
             'phonenumber': order.phonenumber,
