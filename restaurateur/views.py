@@ -4,6 +4,7 @@ from django.views import View
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import user_passes_test
 from django.db.models import Sum
+from django.urls import reverse
 
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
@@ -108,7 +109,9 @@ def view_orders(request):
             'firstname': order.firstname,
             'lastname': order.lastname,
             'phonenumber': order.phonenumber,
-            'payment': order.products.aggregate(Sum('payment'))['payment__sum']
+            'address': order.address,
+            'payment': order.products.aggregate(Sum('payment'))['payment__sum'],
+            'change_url': reverse('admin:foodcartapp_order_change', args=(order.id,), current_app='restaurateur')
         })
 
     return render(request, template_name='order_items.html', context={

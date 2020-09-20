@@ -1,5 +1,6 @@
 from django.templatetags.static import static
 from django.http import JsonResponse
+from django.db import transaction
 import json
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -61,10 +62,10 @@ def product_list_api(request):
 
 
 @api_view(['POST'])
+@transaction.atomic
 def register_order(request):
     serializer = OrderSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
-
     order = Order.objects.create(
         firstname=serializer.validated_data['firstname'],
         lastname=serializer.validated_data['lastname'],
