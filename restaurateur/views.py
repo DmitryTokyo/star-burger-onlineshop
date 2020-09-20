@@ -114,6 +114,7 @@ def view_orders(request):
             'payment': order.products.aggregate(Sum('payment'))['payment__sum'],
             'change_url': reverse('admin:foodcartapp_order_change', args=(order.id,), current_app='restaurateur'),
             'comment': order.comment,
+            'payment_method': order.payment_method,
         })
 
     return render(request, template_name='order_items.html', context={

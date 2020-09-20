@@ -75,6 +75,10 @@ class Order(models.Model):
         ('UP', 'Необработанный'),
         ('PR', 'Обработанный'),
     ]
+    PAYMENT_METHOD = [
+        ('CA', 'Наличные'),
+        ('CC', 'Электронно')
+    ]
 
     firstname = models.CharField('Имя', max_length=50)
     lastname = models.CharField('Фамилия', max_length=100)
@@ -82,6 +86,7 @@ class Order(models.Model):
     address = models.CharField('Адрес', max_length=150)
     order_status = models.CharField('Статус', max_length=3, choices=ORDER_STATUS_CHOICES, default='Необработанный')
     comment = models.TextField('Комментарии', blank=True, default='')
+    payment_method = models.CharField('Тип оплаты', max_length=2, choices=PAYMENT_METHOD, default='Электронно')
 
     time_order_create = models.DateTimeField('Заказ поступил', auto_now=True, blank=True)
     time_order_call = models.DateTimeField('Связались с клиентом', auto_now=False, blank=True, null=True)

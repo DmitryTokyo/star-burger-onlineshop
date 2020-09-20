@@ -116,6 +116,7 @@ class OrderAdmin(admin.ModelAdmin):
         'phonenumber',
         'address',
         'comment',
+        'payment_method',
         'time_order_create',
         'time_order_call',
         'time_order_delivery',
