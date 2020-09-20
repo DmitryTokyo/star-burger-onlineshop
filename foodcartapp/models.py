@@ -5,6 +5,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 
 
+
 class Restaurant(models.Model):
     name = models.CharField('название', max_length=50)
     address = models.CharField('адрес', max_length=100, blank=True)
@@ -68,6 +69,7 @@ class RestaurantMenuItem(models.Model):
             ['restaurant', 'product']
         ]
 
+
 class Order(models.Model):
     firstname = models.CharField('Имя', max_length=50)
     lastname = models.CharField('Фамилия', max_length=100)
@@ -83,9 +85,13 @@ class Order(models.Model):
 
 
 class OrderProduct(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='orders', verbose_name='Продукт')
-    quantity = models.IntegerField('Количество', validators=[MinValueValidator(0), MaxValueValidator(10)])
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='orders', verbose_name='продукт')
+    quantity = models.IntegerField('количество', validators=[MinValueValidator(0), MaxValueValidator(10)])
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='products')
+    payment = models.DecimalField('стоимость', max_digits=8, decimal_places=2, null=True)
 
     def __str__(self):
         return self.product.name
+
+    def get_products_cost(self):
+        return self.product.price * self.quantity
