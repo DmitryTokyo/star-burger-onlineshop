@@ -109,7 +109,19 @@ class OrderProductInline(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    fields = ['order_status', 'firstname', 'lastname', 'phonenumber', 'address', 'comment']
+    fields = [
+        'order_status',
+        'firstname',
+        'lastname',
+        'phonenumber',
+        'address',
+        'comment',
+        'time_order_create',
+        'time_order_call',
+        'time_order_delivery',
+        ]
+    readonly_fields = ['time_order_create']
+
     def response_change(self, request, obj):
         res = super(OrderAdmin, self).response_change(request, obj)
         if "next" in request.GET:

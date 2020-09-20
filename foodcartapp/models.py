@@ -83,6 +83,10 @@ class Order(models.Model):
     order_status = models.CharField('Статус', max_length=3, choices=ORDER_STATUS_CHOICES, default='Необработанный')
     comment = models.TextField('Комментарии', blank=True, default='')
 
+    time_order_create = models.DateTimeField('Заказ поступил', auto_now=True, blank=True)
+    time_order_call = models.DateTimeField('Связались с клиентом', auto_now=False, blank=True, null=True)
+    time_order_delivery = models.DateTimeField('Заказ отправлен', auto_now=False, blank=True, null=True)
+
     def __str__(self):
         return f'{self.lastname} {self.firstname}'
 
