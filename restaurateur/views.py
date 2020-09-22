@@ -10,8 +10,9 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
 
 
-from foodcartapp.models import Product, Restaurant
+from foodcartapp.models import Product, Restaurant, RestaurantMenuItem
 from foodcartapp.models import Order
+from restaurateur.restaurant_list import get_restaraunt_list
 
 
 class Login(forms.Form):
@@ -100,10 +101,11 @@ def view_restaurants(request):
 
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
-    orders = Order.objects.all().prefetch_related('products')
-
+    orders = Order.objects.all().prefetch_related('products__product__menu_items__restaurant')
     order_items = []
     for order in orders:
+        restaurants = get_restaraunt_list(order)
+        print(restaurants)
         order_items.append({
             'id': order.id,
             'status': order.get_order_status_display(),
@@ -115,6 +117,7 @@ def view_orders(request):
             'change_url': reverse('admin:foodcartapp_order_change', args=(order.id,), current_app='restaurateur'),
             'comment': order.comment,
             'payment_method': order.payment_method,
+            'restaurants': restaurants,
         })
 
     return render(request, template_name='order_items.html', context={
