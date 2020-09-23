@@ -80,17 +80,17 @@ class Order(models.Model):
         ('CC', 'Электронно')
     ]
 
-    firstname = models.CharField('Имя', max_length=50)
-    lastname = models.CharField('Фамилия', max_length=100)
-    phonenumber = PhoneNumberField(verbose_name='Телефон')
-    address = models.CharField('Адрес', max_length=150)
-    order_status = models.CharField('Статус', max_length=3, choices=ORDER_STATUS_CHOICES, default='Необработанный')
-    comment = models.TextField('Комментарии', blank=True, default='')
-    payment_method = models.CharField('Тип оплаты', max_length=2, choices=PAYMENT_METHOD, default='Электронно')
+    firstname = models.CharField('имя', max_length=50)
+    lastname = models.CharField('фамилия', max_length=100)
+    phonenumber = PhoneNumberField(verbose_name='телефон')
+    address = models.CharField('адрес', max_length=150)
+    order_status = models.CharField('статус', max_length=3, choices=ORDER_STATUS_CHOICES, default='Необработанный')
+    comment = models.TextField('комментарии', blank=True, default='')
+    payment_method = models.CharField('тип оплаты', max_length=2, choices=PAYMENT_METHOD, default='Электронно')
 
-    time_order_create = models.DateTimeField('Заказ поступил', auto_now=True, blank=True)
-    time_order_call = models.DateTimeField('Связались с клиентом', auto_now=False, blank=True, null=True)
-    time_order_delivery = models.DateTimeField('Заказ отправлен', auto_now=False, blank=True, null=True)
+    time_order_create = models.DateTimeField('заказ поступил', auto_now=True, blank=True)
+    time_order_call = models.DateTimeField('связались с клиентом', auto_now=False, blank=True, null=True)
+    time_order_delivery = models.DateTimeField('заказ отправлен', auto_now=False, blank=True, null=True)
 
     def __str__(self):
         return f'{self.lastname} {self.firstname}'
