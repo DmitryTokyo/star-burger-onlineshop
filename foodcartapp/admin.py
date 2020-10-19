@@ -2,9 +2,10 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django.shortcuts import reverse
 from django.http import HttpResponseRedirect
+from adminsortable2.admin import SortableAdminMixin
 
 from .models import Restaurant, Product, RestaurantMenuItem, ProductCategory
-from foodcartapp.models import Order, OrderProduct
+from foodcartapp.models import Order, OrderProduct, Banner
 
 
 class RestaurantMenuItemInline(admin.TabularInline):
@@ -133,3 +134,12 @@ class OrderAdmin(admin.ModelAdmin):
     inlines = [
         OrderProductInline
     ]
+
+@admin.register(Banner)
+class BannerAdmin(SortableAdminMixin, admin.ModelAdmin):
+    model = Banner
+    readonly_fields = ['preview_image']
+    list_display = ['preview_image', 'title']
+
+    def preview_image(self, obj):
+        return format_html('<img src="{url}" width="250"/>', url=obj.image.url)
