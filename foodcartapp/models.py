@@ -111,3 +111,18 @@ class OrderProduct(models.Model):
 
     def get_products_cost(self):
         return self.product.price * self.quantity
+
+
+class Banner(models.Model):
+    image = models.ImageField('баннер', upload_to='banners/')
+    title = models.CharField('название', max_length=200)
+    description = models.TextField('описание')
+    banner_order = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return f'{self.title}'
+
+    class Meta:
+        ordering = ['banner_order']
+        verbose_name = 'баннер'
+        verbose_name_plural = 'баннеры'
