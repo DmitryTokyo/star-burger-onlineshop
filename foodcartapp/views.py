@@ -68,3 +68,25 @@ def register_order(request):
     serializer = OrderSerializer(created_order)
 
     return Response(serializer.data, status=201)
+
+
+@api_view(['GET', 'DELETE', 'UPDATE'])
+def handle_order_detail(request, pk):
+    try:
+        order = Order.objects.get(pk=pk)
+    except Order.DoesNotExist:
+        return Response({'message': 'The order does not exist'}, status=404)
+
+    if request.method == 'GET':
+        serializer = OrderSerializer(order)
+        return Response(serializer.data)
+
+    if request.method == 'DELETE':
+        order.delete()
+        return Response({'message': 'The order was deleted successfully!'}, status=204)
+    
+    if 
+
+
+
+
