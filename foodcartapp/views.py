@@ -70,7 +70,7 @@ def register_order(request):
     return Response(serializer.data, status=201)
 
 
-@api_view(['GET', 'DELETE', 'UPDATE'])
+@api_view(['GET', 'DELETE', 'PATCH'])
 def handle_order_detail(request, pk):
     try:
         order = Order.objects.get(pk=pk)
@@ -84,8 +84,13 @@ def handle_order_detail(request, pk):
     if request.method == 'DELETE':
         order.delete()
         return Response({'message': 'The order was deleted successfully!'}, status=204)
-    
-    if 
+
+    if request.method == 'PATCH':
+        serializer = OrderSerializer(order, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=201)
+
 
 
 
