@@ -142,4 +142,4 @@ class BannerAdmin(SortableAdminMixin, admin.ModelAdmin):
     list_display = ['preview_image', 'title']
 
     def preview_image(self, obj):
-        return format_html('<img src="{url}" width="250"/>', url=obj.image.url)
+        return format_html('<img src="{url}" width="250"/>', url=obj.src.url)
