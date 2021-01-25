@@ -114,7 +114,7 @@ class OrderProduct(models.Model):
 
 
 class Banner(models.Model):
-    image = models.ImageField('баннер', upload_to='banners/')
+    src = models.ImageField('баннер', upload_to='banners/')
     title = models.CharField('название', max_length=200)
     description = models.TextField('описание')
     banner_order = models.PositiveIntegerField(default=0)

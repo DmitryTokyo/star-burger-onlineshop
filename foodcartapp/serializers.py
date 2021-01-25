@@ -19,4 +19,4 @@ class OrderSerializer(serializers.ModelSerializer):
 class BannerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Banner
-        fields = ['title', 'image', 'description']
+        fields = ['title', 'src', 'description']

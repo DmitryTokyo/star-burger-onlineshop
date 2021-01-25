@@ -13,7 +13,7 @@ from foodcartapp.serializers import OrderSerializer, OrderProductSerializer, Ban
 def banners_list_api(request):
     banners = Banner.objects.all()
     serializer = BannerSerializer(banners, many=True)
-    return Response(serializer.data)
+    return Response(serializer.data, status=200)
 
 
 def product_list_api(request):
@@ -90,8 +90,3 @@ def handle_order_detail(request, pk):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=201)
-
-
-
-
-
