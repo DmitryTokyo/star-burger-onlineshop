@@ -84,7 +84,7 @@ class Order(models.Model):
     lastname = models.CharField('фамилия', max_length=100)
     phonenumber = PhoneNumberField(verbose_name='телефон')
     address = models.CharField('адрес', max_length=150)
-    order_status = models.CharField('статус', max_length=3, choices=ORDER_STATUS_CHOICES, default='Необработанный')
+    order_status = models.CharField('статус', max_length=3, choices=ORDER_STATUS_CHOICES, default='Необработанный', db_index=True)
     comment = models.TextField('комментарии', blank=True, default='')
     payment_method = models.CharField('тип оплаты', max_length=2, choices=PAYMENT_METHOD, default='Электронно')
 
@@ -103,7 +103,7 @@ class Order(models.Model):
 class OrderProduct(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='order_products', verbose_name='продукт')
     quantity = models.IntegerField('количество', validators=[MinValueValidator(0), MaxValueValidator(10)])
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='products')
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='products', verbose_name='заказ')
     payment = models.DecimalField('стоимость', max_digits=8, decimal_places=2, null=True)
 
     def __str__(self):
@@ -117,7 +117,7 @@ class Banner(models.Model):
     src = models.ImageField('баннер', upload_to='banners/')
     title = models.CharField('название', max_length=200)
     description = models.TextField('описание')
-    banner_order = models.PositiveIntegerField(default=0)
+    banner_order = models.PositiveIntegerField(default=0, verbose_name='место баннера', db_index=True)
 
     def __str__(self):
         return f'{self.title}'
