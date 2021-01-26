@@ -118,11 +118,11 @@ class OrderAdmin(admin.ModelAdmin):
         'address',
         'comment',
         'payment_method',
-        'time_order_create',
-        'time_order_call',
-        'time_order_delivery',
+        'create_time',
+        'call_time',
+        'delivery_time',
         ]
-    readonly_fields = ['time_order_create']
+    readonly_fields = ['create_time']
 
     def response_change(self, request, obj):
         res = super(OrderAdmin, self).response_change(request, obj)
