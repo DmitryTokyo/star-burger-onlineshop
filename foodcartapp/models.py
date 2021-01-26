@@ -89,8 +89,8 @@ class Order(models.Model):
     payment_method = models.CharField('тип оплаты', max_length=2, choices=PAYMENT_METHOD, default='Электронно')
 
     time_order_create = models.DateTimeField('заказ поступил', auto_now=True, blank=True)
-    time_order_call = models.DateTimeField('связались с клиентом', auto_now=False, blank=True, null=True)
-    time_order_delivery = models.DateTimeField('заказ отправлен', auto_now=False, blank=True, null=True)
+    time_order_call = models.DateTimeField('связались с клиентом', blank=True, null=True)
+    time_order_delivery = models.DateTimeField('заказ отправлен', blank=True, null=True)
 
     def __str__(self):
         return f'{self.lastname} {self.firstname}'
