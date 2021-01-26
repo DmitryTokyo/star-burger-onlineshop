@@ -106,7 +106,7 @@ class ProductAdmin(admin.ModelAdmin):
 
 class OrderProductInline(admin.TabularInline):
     model = OrderProduct
-    fields = ['product', 'quantity', 'payment']
+    fields = ['product', 'quantity', 'cost']
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):

@@ -42,7 +42,7 @@ class Product(models.Model):
     price = models.DecimalField('цена', max_digits=8, decimal_places=2, validators=[MinValueValidator(0)])
     image = models.ImageField('картинка')
     special_status = models.BooleanField('спец.предложение', default=False, db_index=True)
-    ingridients = models.CharField('ингредиенты', max_length=200, blank=True)
+    ingredients = models.CharField('ингредиенты', max_length=200, blank=True)
 
     objects = ProductQuerySet.as_manager()
 
@@ -104,7 +104,7 @@ class OrderProduct(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='order_products', verbose_name='продукт')
     quantity = models.IntegerField('количество', validators=[MinValueValidator(0), MaxValueValidator(10)])
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_products', verbose_name='заказ')
-    payment = models.DecimalField('стоимость', max_digits=8, decimal_places=2, null=True, validators=[MinValueValidator(0)])
+    cost = models.DecimalField('стоимость', max_digits=8, decimal_places=2, null=True, validators=[MinValueValidator(0)])
 
     def __str__(self):
         return self.product.name

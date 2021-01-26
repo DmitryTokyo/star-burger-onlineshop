@@ -8,7 +8,7 @@ from restaurateur.fetch_coordinates import fetch_coordinates
 
 
 def get_restaraunts_and_distance_from_order(order, address):
-    products = order.products.all()
+    products = order.order_products.all()
     restaurants_make_products = []
     for product in products:
         restaurants_make_products.append([restaurant_item.restaurant.name for restaurant_item in product.product.menu_items.all()])
