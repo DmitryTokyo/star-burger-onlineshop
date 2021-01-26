@@ -56,6 +56,8 @@ def register_order(request):
         address=serializer.validated_data['address'],
     )
 
+    request.session[f'order_{order.pk}'] = order.pk
+
     products_in_order = serializer.validated_data['products']
     products = [OrderProduct(order=order, **fields) for fields in products_in_order]
 
@@ -72,6 +74,12 @@ def register_order(request):
 
 @api_view(['GET', 'DELETE', 'PATCH'])
 def handle_order_detail(request, pk):
+    try:
+        request.session[f'order_{pk}']
+    except KeyError:
+        message = 'Your order does not in database. Please check order number again'
+        return Response({'message': message}, status=400)
+
     try:
         order = Order.objects.get(pk=pk)
     except Order.DoesNotExist:
