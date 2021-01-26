@@ -39,7 +39,7 @@ class Product(models.Model):
     name = models.CharField('название', max_length=50)
     category = models.ForeignKey(ProductCategory, null=True, blank=True, on_delete=models.SET_NULL,
                                  verbose_name='категория', related_name='products')
-    price = models.DecimalField('цена', max_digits=8, decimal_places=2)
+    price = models.DecimalField('цена', max_digits=8, decimal_places=2, validators=[MinValueValidator(0)])
     image = models.ImageField('картинка')
     special_status = models.BooleanField('спец.предложение', default=False, db_index=True)
     ingridients = models.CharField('ингредиенты', max_length=200, blank=True)
@@ -85,7 +85,7 @@ class Order(models.Model):
     phonenumber = PhoneNumberField(verbose_name='телефон')
     address = models.CharField('адрес', max_length=150)
     order_status = models.CharField('статус', max_length=3, choices=ORDER_STATUS_CHOICES, default='Необработанный', db_index=True)
-    comment = models.TextField('комментарии', blank=True, default='')
+    comment = models.TextField('комментарии', blank=True)
     payment_method = models.CharField('тип оплаты', max_length=2, choices=PAYMENT_METHOD, default='Электронно')
 
     time_order_create = models.DateTimeField('заказ поступил', auto_now=True, blank=True)
@@ -104,7 +104,7 @@ class OrderProduct(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='order_products', verbose_name='продукт')
     quantity = models.IntegerField('количество', validators=[MinValueValidator(0), MaxValueValidator(10)])
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='products', verbose_name='заказ')
-    payment = models.DecimalField('стоимость', max_digits=8, decimal_places=2, null=True)
+    payment = models.DecimalField('стоимость', max_digits=8, decimal_places=2, null=True, validators=[MinValueValidator(0)])
 
     def __str__(self):
         return self.product.name
