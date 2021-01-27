@@ -109,9 +109,6 @@ class OrderProduct(models.Model):
     def __str__(self):
         return self.product.name
 
-    def get_products_cost(self):
-        return self.product.price * self.quantity
-
 
 class Banner(models.Model):
     src = models.ImageField('баннер', upload_to='banners/')
