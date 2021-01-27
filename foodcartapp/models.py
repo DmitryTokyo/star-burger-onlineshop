@@ -104,7 +104,7 @@ class OrderProduct(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='order_products', verbose_name='продукт')
     quantity = models.IntegerField('количество', validators=[MinValueValidator(0), MaxValueValidator(10)])
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_products', verbose_name='заказ')
-    cost = models.DecimalField('стоимость', max_digits=8, decimal_places=2, null=True, validators=[MinValueValidator(0)])
+    product_cost = models.DecimalField('стоимость 1ед', max_digits=8, decimal_places=2, null=True, validators=[MinValueValidator(0)])
 
     def __str__(self):
         return self.product.name

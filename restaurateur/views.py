@@ -3,7 +3,7 @@ from django.shortcuts import redirect, render
 from django.views import View
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import user_passes_test
-from django.db.models import Sum
+from django.db.models import Sum, F, DecimalField
 from django.urls import reverse
 
 from django.contrib.auth import authenticate, login
@@ -112,7 +112,7 @@ def view_orders(request):
             'lastname': order.lastname,
             'phonenumber': order.phonenumber,
             'address': order.address,
-            'cost': order.order_products.aggregate(Sum('cost'))['cost__sum'],
+            'cost': order.order_products.aggregate(total_cost=Sum(F('product_cost')*F('quantity'), output_field=DecimalField()))['total_cost'],
             'change_url': reverse('admin:foodcartapp_order_change', args=(order.id,), current_app='restaurateur'),
             'comment': order.comment,
             'payment_method': order.payment_method,
