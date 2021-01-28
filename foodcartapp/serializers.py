@@ -9,11 +9,11 @@ class OrderProductSerializer(serializers.ModelSerializer):
 
 
 class OrderSerializer(serializers.ModelSerializer):
-    products = OrderProductSerializer(many=True, write_only=True)
+    order_products = OrderProductSerializer(many=True, write_only=True)
 
     class Meta:
         model = Order
-        fields = ['id', 'firstname', 'lastname', 'phonenumber', 'address', 'products']
+        fields = ['id', 'firstname', 'lastname', 'phonenumber', 'address', 'order_products']
 
 
 class BannerSerializer(serializers.ModelSerializer):
