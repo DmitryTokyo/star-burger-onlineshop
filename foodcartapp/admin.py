@@ -2,10 +2,14 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django.shortcuts import reverse
 from django.http import HttpResponseRedirect
+from django.utils.http import url_has_allowed_host_and_scheme
 from adminsortable2.admin import SortableAdminMixin
+from environs import Env
 
 from .models import Restaurant, Product, RestaurantMenuItem, ProductCategory
 from foodcartapp.models import Order, OrderProduct, Banner
+
+env = Env()
 
 
 class RestaurantMenuItemInline(admin.TabularInline):
@@ -126,7 +130,9 @@ class OrderAdmin(admin.ModelAdmin):
 
     def response_change(self, request, obj):
         res = super(OrderAdmin, self).response_change(request, obj)
-        if "next" in request.GET:
+
+        if url_has_allowed_host_and_scheme(request.GET['next'], allowed_hosts=env.list('ALLOWED_HOSTS')):
+            print(request.get_host())
             return HttpResponseRedirect(request.GET['next'])
         else:
             return res
