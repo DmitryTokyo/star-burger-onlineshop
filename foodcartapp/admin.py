@@ -129,13 +129,12 @@ class OrderAdmin(admin.ModelAdmin):
     readonly_fields = ['create_time']
 
     def response_change(self, request, obj):
-        res = super(OrderAdmin, self).response_change(request, obj)
+        response = super(OrderAdmin, self).response_change(request, obj)
 
-        if url_has_allowed_host_and_scheme(request.GET['next'], allowed_hosts=env.list('ALLOWED_HOSTS')):
-            print(request.get_host())
-            return HttpResponseRedirect(request.GET['next'])
-        else:
-            return res
+        if not url_has_allowed_host_and_scheme(request.GET['next'], allowed_hosts=env.list('ALLOWED_HOSTS')):
+            return response
+
+        return HttpResponseRedirect(request.GET['next'])
 
     inlines = [
         OrderProductInline
