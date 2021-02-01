@@ -101,7 +101,7 @@ def view_restaurants(request):
 
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
-    orders = Order.objects.all().prefetch_related('order_products__product__menu_items__restaurant')
+    orders = Order.objects.all().prefetch_related('order_products')
     order_items = []
     for order in orders:
         restaurants = get_restaraunts_and_distance_from_order(order, order.address)
