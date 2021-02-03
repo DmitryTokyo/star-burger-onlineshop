@@ -7,3 +7,5 @@ geopy==2.0.0
 django_phonenumber_field==5.0.0
 djangorestframework==3.11.1
 django-admin-sortable2==0.7.7
+phonenumbers==8.12.17
+Pillow==8.1.0
