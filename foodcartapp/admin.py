@@ -71,7 +71,7 @@ class ProductAdmin(admin.ModelAdmin):
         ('Подробно', {
             'fields': [
                 'special_status',
-                'ingridients',
+                'ingredients',
             ],
             'classes': [
                 'wide'
