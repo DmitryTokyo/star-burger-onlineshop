@@ -1,6 +1,5 @@
 import requests
 from environs import Env
-from geopy import distance
 
 env = Env()
 env.read_env()

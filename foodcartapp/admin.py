@@ -3,6 +3,7 @@ from django.utils.html import format_html
 from django.shortcuts import reverse
 from django.http import HttpResponseRedirect
 from django.utils.http import url_has_allowed_host_and_scheme
+from django.conf import settings
 from adminsortable2.admin import SortableAdminMixin
 from environs import Env
 
@@ -130,11 +131,14 @@ class OrderAdmin(admin.ModelAdmin):
 
     def response_change(self, request, obj):
         response = super(OrderAdmin, self).response_change(request, obj)
+        allowed_hosts = settings.ALLOWED_HOSTS
 
-        if not url_has_allowed_host_and_scheme(request.GET['next'], allowed_hosts=env.list('ALLOWED_HOSTS')):
-            return response
-
-        return HttpResponseRedirect(request.GET['next'])
+        if request.GET['next']:
+            if not url_has_allowed_host_and_scheme(request.GET['next'], allowed_hosts=allowed_hosts):
+                return response
+            return HttpResponseRedirect(request.GET['next'])
+        
+        return response
 
     inlines = [
         OrderProductInline
