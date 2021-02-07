@@ -101,7 +101,7 @@ def view_restaurants(request):
 
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
-    orders = Order.objects.all().prefetch_related('order_products')
+    orders = Order.objects.all().annotate(total_cost=Sum(F('order_products__product_cost')*F('order_products__quantity'), output_field=DecimalField())).prefetch_related('order_products')
     order_items = []
     for order in orders:
         restaurants = get_restaurants_and_delivery_distance(order, order.address)
@@ -112,7 +112,7 @@ def view_orders(request):
             'lastname': order.lastname,
             'phonenumber': order.phonenumber,
             'address': order.address,
-            'cost': order.order_products.aggregate(total_cost=Sum(F('product_cost')*F('quantity'), output_field=DecimalField()))['total_cost'],
+            'cost': order.total_cost,
             'change_url': reverse('admin:foodcartapp_order_change', args=(order.id,), current_app='restaurateur'),
             'comment': order.comment,
             'payment_method': order.payment_method,
