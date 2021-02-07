@@ -8,21 +8,21 @@ from django.core.exceptions import ObjectDoesNotExist
 from restaurateur.fetch_coordinates import fetch_coordinates
 
 
-def get_restaurants_and_distance_from_order(order, delivery_address):
+def get_restaurants_and_delivery_distance(order, delivery_address):
     order_products = order.order_products.all().prefetch_related('product__menu_items__restaurant')
     product_sell_restaurants = []
     for order_product in order_products:
         product_sell_restaurants.append([restaurant_item.restaurant for restaurant_item in order_product.product.menu_items.all()])
 
     if len(product_sell_restaurants) > 1:
-        restaurants = get_restaurants(product_sell_restaurants)
-        return get_restaurant_and_distance(restaurants, delivery_address)
+        restaurants = sort_restaurants_by_products(product_sell_restaurants)
+        return get_restaurants_and_distance(restaurants, delivery_address)
 
     restaurants_list = product_sell_restaurants[0]
-    return get_restaurant_and_distance(restaurants_list, delivery_address)
+    return get_restaurants_and_distance(restaurants_list, delivery_address)
 
 
-def get_restaurants(restaurants):
+def sort_restaurants_by_products(restaurants):
     restaurant_list = []
     for count in range(1, len(restaurants)):
         if count == 1:
@@ -37,7 +37,7 @@ def get_restaurants(restaurants):
     return restaurants_list
 
 
-def get_restaurant_and_distance(restaurants_list, delivery_address):
+def get_restaurants_and_distance(restaurants_list, delivery_address):
     restaurants = []
     for restaurant in restaurants_list:
         restaurants.append({
