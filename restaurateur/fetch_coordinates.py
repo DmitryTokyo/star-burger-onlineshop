@@ -1,14 +1,10 @@
 import requests
-from environs import Env
+from django.conf import settings
 
-env = Env()
-env.read_env()
-
-APIKEY = env('APIKEY')
 
 def fetch_coordinates(place):
     base_url = "https://geocode-maps.yandex.ru/1.x"
-    params = {"geocode": place, "apikey": APIKEY, "format": "json"}
+    params = {"geocode": place, "apikey": settings.APIKEY, "format": "json"}
     response = requests.get(base_url, params=params)
     response.raise_for_status()
     places_found = response.json()['response']['GeoObjectCollection']['featureMember']
