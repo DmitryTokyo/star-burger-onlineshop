@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'rest_framework',
     'phonenumber_field',
+    'django_extensions',
 
     'adminsortable2',
 ]
