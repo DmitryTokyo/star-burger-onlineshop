@@ -1,22 +1,25 @@
 import os
-from environs import Env
+import environ
 
 import dj_database_url
 
-env = Env()
-env.read_env()
+env = environ.Env()
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env('SECRET_KEY')
+SECRET_KEY = env('SECRET_KEY', default='dev_key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env.bool('DEBUG', False)
+DEBUG = env.bool('DEBUG', default=False)
 
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
+APIKEY = env('APIKEY')
+
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['127.0.0.1'])
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 INSTALLED_APPS = [
     'foodcartapp.apps.FoodcartappConfig',
@@ -27,11 +30,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     'debug_toolbar',
-    'phonenumber_field',
     'rest_framework',
+    'phonenumber_field',
+
     'adminsortable2',
 ]
+
+DEBUG_TOOLBAR_CONFIG = {
+        'DISABLE_PANELS': ['debug_toolbar.panels.redirects.RedirectsPanel'],
+        'SHOW_TEMPLATE_CONTEXT': True,
+    }
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -131,9 +141,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-INTERNAL_IPS = [
-    '127.0.0.1'
-]
+INTERNAL_IPS = ['127.0.0.1']
 
 
 STATICFILES_DIRS = [
