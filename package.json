@@ -16,5 +16,8 @@
     "react-transition-group": "^4.4.1",
     "regenerator": "^0.14.7",
     "resolve": "^1.20.0"
+  },
+  "devDependencies": {
+    "parcel": "^2.0.1"
   }
 }
