@@ -5,12 +5,9 @@ from django.http import HttpResponseRedirect
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.conf import settings
 from adminsortable2.admin import SortableAdminMixin
-from environs import Env
 
 from .models import Restaurant, Product, RestaurantMenuItem, ProductCategory
 from foodcartapp.models import Order, OrderProduct, Banner
-
-env = Env()
 
 
 class RestaurantMenuItemInline(admin.TabularInline):
@@ -109,9 +106,11 @@ class ProductAdmin(admin.ModelAdmin):
 class ProductAdmin(admin.ModelAdmin):
     pass
 
+
 class OrderProductInline(admin.TabularInline):
     model = OrderProduct
     fields = ['product', 'quantity', 'product_cost']
+
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
@@ -143,6 +142,7 @@ class OrderAdmin(admin.ModelAdmin):
     inlines = [
         OrderProductInline
     ]
+
 
 @admin.register(Banner)
 class BannerAdmin(SortableAdminMixin, admin.ModelAdmin):
