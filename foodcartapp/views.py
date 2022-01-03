@@ -1,12 +1,10 @@
-from django.templatetags.static import static
 from django.http import JsonResponse
 from django.db import transaction
-import json
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from foodcartapp.models import Product, OrderProduct, Order, Banner
-from foodcartapp.serializers import OrderSerializer, OrderProductSerializer, BannerSerializer
+from foodcartapp.models import Product, OrderItem, Order, Banner
+from foodcartapp.serializers import OrderSerializer, BannerSerializer
 
 
 @api_view(['GET'])
@@ -64,12 +62,12 @@ def register_order(request):
     request.session[f'order_{order.pk}'] = order.pk
 
     products_in_order = serializer.validated_data['order_products']
-    order_products = [OrderProduct(order=order, **fields) for fields in products_in_order]
+    order_products = [OrderItem(order=order, **fields) for fields in products_in_order]
 
     for order_product in order_products:
         order_product.product_cost = order_product.product.price
 
-    OrderProduct.objects.bulk_create(order_products)
+    OrderItem.objects.bulk_create(order_products)
 
     created_order = Order.objects.get(pk=order.pk)
     serializer = OrderSerializer(created_order)

@@ -7,7 +7,7 @@ from django.conf import settings
 from adminsortable2.admin import SortableAdminMixin
 
 from .models import Restaurant, Product, RestaurantMenuItem, ProductCategory
-from foodcartapp.models import Order, OrderProduct, Banner
+from foodcartapp.models import Order, OrderItem, Banner
 
 
 class RestaurantMenuItemInline(admin.TabularInline):
@@ -107,8 +107,8 @@ class ProductAdmin(admin.ModelAdmin):
     pass
 
 
-class OrderProductInline(admin.TabularInline):
-    model = OrderProduct
+class OrderItemInline(admin.TabularInline):
+    model = OrderItem
     fields = ['product', 'quantity', 'product_cost']
 
 
@@ -140,7 +140,7 @@ class OrderAdmin(admin.ModelAdmin):
             return response
         
     inlines = [
-        OrderProductInline
+        OrderItemInline
     ]
 
 

@@ -1,15 +1,15 @@
 from rest_framework import serializers
-from foodcartapp.models import Order, OrderProduct, Banner
+from foodcartapp.models import Order, OrderItem, Banner
 
 
-class OrderProductSerializer(serializers.ModelSerializer):
+class OrderItemsSerializer(serializers.ModelSerializer):
     class Meta:
-        model = OrderProduct
+        model = OrderItem
         fields = ['product', 'quantity']
 
 
 class OrderSerializer(serializers.ModelSerializer):
-    order_products = OrderProductSerializer(many=True, write_only=True)
+    order_products = OrderItemsSerializer(many=True, write_only=True)
 
     class Meta:
         model = Order
