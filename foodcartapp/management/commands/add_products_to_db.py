@@ -1,6 +1,6 @@
 from json import JSONDecodeError
 from pathlib import Path
-from typing import Optional, Any, BinaryIO
+from typing import Any, BinaryIO
 
 import requests
 from django.core.files import File
@@ -24,7 +24,7 @@ class Command(BaseCommand):
             help='Show products information without objects creation',
         )
 
-    def handle(self, *args, **options) -> None:
+    def handle(self, *args: Any, **options: Any) -> None:
         self.dry_run = options['dry_run']
         products_json_url = options['products_json_url']
 
@@ -80,7 +80,7 @@ class Command(BaseCommand):
 
         return File(image_file)
 
-    def _make_request_to(self, url: str) -> Optional[Response]:
+    def _make_request_to(self, url: str) -> Response | None:
         try:
             response = requests.get(url)
         except RequestException as e:
@@ -89,7 +89,7 @@ class Command(BaseCommand):
 
         return response
 
-    def _get_response_content_from(self, response: Response) -> Optional[Response]:
+    def _get_response_content_from(self, response: Response) -> Response | None:
         try:
             response_content = response.json()
         except JSONDecodeError as e:
