@@ -48,7 +48,7 @@ def register_order(request):
     serializer = OrderSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
 
-    if not serializer.validated_data['order_products']:
+    if not serializer.validated_data['order_items']:
         content = {'message': 'order_product can not be empty'}
         return Response(content, status=400)
 
@@ -61,7 +61,7 @@ def register_order(request):
 
     request.session[f'order_{order.pk}'] = order.pk
 
-    products_in_order = serializer.validated_data['order_products']
+    products_in_order = serializer.validated_data['order_items']
     order_products = [OrderItem(order=order, **fields) for fields in products_in_order]
 
     for order_product in order_products:
