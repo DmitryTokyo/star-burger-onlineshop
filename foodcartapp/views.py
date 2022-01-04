@@ -49,7 +49,7 @@ def register_order(request):
     serializer.is_valid(raise_exception=True)
 
     if not serializer.validated_data['order_items']:
-        content = {'message': 'order_product can not be empty'}
+        content = {'message': 'order_items can not be empty'}
         return Response(content, status=400)
 
     order = Order.objects.create(
