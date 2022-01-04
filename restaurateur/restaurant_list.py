@@ -9,10 +9,16 @@ from restaurateur.fetch_coordinates import fetch_coordinates
 
 
 def get_restaurants_and_delivery_distance(order, delivery_address):
-    order_products = order.order_products.all().prefetch_related('product__menu_items__restaurant')
+    order_items = order.order_items.all().prefetch_related('product__menu_items__restaurant')
     product_sell_restaurants = []
-    for order_product in order_products:
-        product_sell_restaurants.append([restaurant_item.restaurant for restaurant_item in order_product.product.menu_items.all()])
+    for order_item in order_items:
+        product_sell_restaurants.append(
+            [
+                restaurant_item.restaurant
+                for restaurant_item
+                in order_item.product.menu_items.all()
+            ]
+        )
 
     if len(product_sell_restaurants) > 1:
         restaurants = sort_restaurants_by_products(product_sell_restaurants)
