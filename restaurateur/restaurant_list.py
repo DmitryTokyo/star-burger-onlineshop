@@ -1,10 +1,7 @@
-from django.db import models
-from foodcartapp.models import Product, Restaurant, RestaurantMenuItem
-from foodcartapp.models import Order, RestaurantLocation, DeliveryLocation
-from geopy import distance
-from django.db import connection
 from django.core.exceptions import ObjectDoesNotExist
+from geopy import distance
 
+from foodcartapp.models import Location
 from restaurateur.fetch_coordinates import fetch_coordinates
 
 
@@ -29,7 +26,7 @@ def get_restaurants_and_delivery_distance(order, delivery_address):
 
 
 def sort_restaurants_by_products(restaurants):
-    restaurant_list = []
+    restaurants_list = []
     for count in range(1, len(restaurants)):
         if count == 1:
             restaurants_list = list(set(restaurants[0]) & set(restaurants[count]))
@@ -55,28 +52,28 @@ def get_restaurants_and_distance(restaurants_list, delivery_address):
 
 def get_distance(restaurant_address, delivery_address):
     try:
-        restaurant_location = RestaurantLocation.objects.get(restaurant_address=restaurant_address)
+        restaurant_location = Location.objects.get(restaurant_address=restaurant_address)
         restaurant_lon = restaurant_location.restaurant_lon
         restaurant_lat = restaurant_location.restaurant_lat
     except ObjectDoesNotExist:
         restaurant_lon, restaurant_lat = fetch_coordinates(restaurant_address)
-        restaurant_location = RestaurantLocation.objects.create(
-            restaurant_address = restaurant_address,
-            restaurant_lon = restaurant_lon,
-            restaurant_lat = restaurant_lat
+        restaurant_location = Location.objects.create(
+            restaurant_address=restaurant_address,
+            restaurant_lon=restaurant_lon,
+            restaurant_lat=restaurant_lat
         )
         restaurant_location.save()
 
     try:
-        delivery_location = DeliveryLocation.objects.get(delivery_address=delivery_address)
+        delivery_location = Location.objects.get(delivery_address=delivery_address)
         delivery_lon = delivery_location.delivery_lon
         delivery_lat = delivery_location.delivery_lat
     except ObjectDoesNotExist:
         delivery_lon, delivery_lat = fetch_coordinates(delivery_address)
-        delivery_location = DeliveryLocation.objects.create(
-            delivery_address = delivery_address,
-            delivery_lon = delivery_lon,
-            delivery_lat = delivery_lat
+        delivery_location = Location.objects.create(
+            delivery_address=delivery_address,
+            delivery_lon=delivery_lon,
+            delivery_lat=delivery_lat
         )
         delivery_location.save()
 

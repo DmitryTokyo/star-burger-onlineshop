@@ -134,13 +134,10 @@ class Banner(models.Model):
         verbose_name_plural = 'баннеры'
 
 
-class RestaurantLocation(models.Model):
+class Location(models.Model):
     restaurant_address = models.CharField('адрес ресторана', max_length=200)
     restaurant_lon = models.FloatField('долгота ресторана')
     restaurant_lat = models.FloatField('широта ресторана')
-
-
-class DeliveryLocation(models.Model):
     delivery_address = models.CharField('адрес доставки', max_length=200)
     delivery_lon = models.FloatField('долгота доставки')
     delivery_lat = models.FloatField('широта доставки')
