@@ -135,6 +135,10 @@ class Banner(models.Model):
 
 
 class Location(models.Model):
+    class Meta:
+        indexes = [
+            models.Index(fields=['restaurant_address', 'delivery_address'])
+        ]
     restaurant_address = models.CharField('адрес ресторана', max_length=200)
     restaurant_lon = models.FloatField('долгота ресторана')
     restaurant_lat = models.FloatField('широта ресторана')
