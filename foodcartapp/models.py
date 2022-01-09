@@ -139,9 +139,9 @@ class Location(models.Model):
         indexes = [
             models.Index(fields=['restaurant_address', 'delivery_address'])
         ]
-    restaurant_address = models.CharField('адрес ресторана', max_length=200)
+    restaurant_address = models.CharField('адрес ресторана', max_length=200, unique=True)
     restaurant_lon = models.FloatField('долгота ресторана')
     restaurant_lat = models.FloatField('широта ресторана')
-    delivery_address = models.CharField('адрес доставки', max_length=200)
+    delivery_address = models.CharField('адрес доставки', max_length=200, unique=True)
     delivery_lon = models.FloatField('долгота доставки')
     delivery_lat = models.FloatField('широта доставки')
