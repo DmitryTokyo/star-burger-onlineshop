@@ -19,13 +19,13 @@
 
 ### Как собрать бэкенд
 
-Скачайте код:
+Скачайте проект:
 
 ```sh
 git clone https://github.com/devmanorg/star-burger.git
 ```
 
-[Установите Python](https://www.python.org/), версии 3.8.1
+В проекте используется [Python](https://www.python.org/downloads/release/python-3100/), версии 3.10.1
 
 Проверьте, что `python` установлен и корректно настроен. Запустите его в командной строке:
 
@@ -36,7 +36,7 @@ python --version
 В каталоге проекта создайте виртуальное окружение:
 
 ```sh
-python -m venv env
+python3.10 -m venv env
 ```
 
 Активируйте его. На разных операционных системах это делается разными командами:
@@ -55,6 +55,17 @@ cd star-burger
 ```sh
 pip install -r requirements.txt
 ```
+
+Вам необходимо задать переменные окружения:
+
+- DEBUG выставить True (по дефолту установлен False).
+- SECRET_KEY желательно задать собственный ключ, но в Development среде вы можете использовать дефолтное значение
+- APIKEY апи ключ от яндекс карт. Нужно получить на странице для разработчиков [Yandex maps](https://passport.yandex.ru/auth?origin=apikeys&retpath=https%3A%2F%2Fdeveloper.tech.yandex.ru%2F)
+- ALLOWED_HOSTS при локальной разработке вы можете пользоваться дефолтным, но на проде необходимо прописать свои.
+
+Переменная окружения создается несколькими способами
+
+1. Либо положите все в файлик 
 
 Создайте файл базы данных SQLite и отмигрируйте её следующей командой:
 
@@ -108,7 +119,7 @@ parcel --version
 Почти всё готово. Теперь запустите сборку фронтенда и не выключайте. Parcel будет работать в фоне и следить за изменениями в JS-коде:
 
 ```sh
-parcel watch bundles-src/index.js -d bundles --public-url="./"
+parcel watch bundles-src/index.js --dist-dir bundles --public-url="./
 ```
 
 Дождитесь завершения первичной сборки. Это вполне может занять 10 и более секунд. О готовности вы узнаете по сообщению в консоли:
@@ -128,8 +139,13 @@ parcel watch bundles-src/index.js -d bundles --public-url="./"
 Собрать фронтенд:
 
 ```sh
-parcel build bundles-src/index.js -d bundles --public-url="./"
+parcel build bundles-src/index.js --dist-dir bundles --public-url="./"
 ```
+
+- DEBUG — дебаг-режим. Поставьте False.
+- SECRET_KEY — секретный ключ проекта, лучше заменить на собственный.
+- ALLOWED_HOSTS — [см. документацию Django](https://docs.djangoproject.com/en/3.1/ref/settings/#allowed-hosts)
+
 
 ## Цели проекта
 
