@@ -101,7 +101,9 @@ def view_restaurants(request):
 
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
-    orders = Order.objects.all().annotate(total_cost=Sum(F('order_items__product_cost')*F('order_items__quantity'), output_field=DecimalField())).prefetch_related('order_items')
+    orders = Order.objects.all().annotate(
+        total_cost=Sum(F('order_items__product_cost')*F('order_items__quantity'), output_field=DecimalField())
+    ).prefetch_related('order_items')
     order_items = []
     for order in orders:
         restaurants = get_restaurants_and_delivery_distance(order, order.address)
