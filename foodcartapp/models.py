@@ -1,7 +1,10 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django_lifecycle import hook, BEFORE_CREATE, BEFORE_SAVE, BEFORE_UPDATE, LifecycleModelMixin
 from phonenumber_field.modelfields import PhoneNumberField
+
+from restaurateur.fetch_coordinates import fetch_coordinates
 
 
 class Restaurant(models.Model):
@@ -134,14 +137,29 @@ class Banner(models.Model):
         verbose_name_plural = 'баннеры'
 
 
-class Location(models.Model):
+class Location(LifecycleModelMixin, models.Model):
     class Meta:
         indexes = [
             models.Index(fields=['restaurant_address', 'delivery_address'])
         ]
-    restaurant_address = models.CharField('адрес ресторана', max_length=200, unique=True)
-    restaurant_lon = models.FloatField('долгота ресторана')
-    restaurant_lat = models.FloatField('широта ресторана')
-    delivery_address = models.CharField('адрес доставки', max_length=200, unique=True)
-    delivery_lon = models.FloatField('долгота доставки')
-    delivery_lat = models.FloatField('широта доставки')
+        constraints = [
+            models.UniqueConstraint(
+                fields=['restaurant_address', 'delivery_address'],
+                name='unique_couple_addresses'
+            )
+        ]
+    restaurant_address = models.CharField('адрес ресторана', max_length=200)
+    restaurant_lon = models.FloatField('долгота ресторана', blank=True, null=True)
+    restaurant_lat = models.FloatField('широта ресторана', blank=True, null=True)
+    delivery_address = models.CharField('адрес доставки', max_length=200)
+    delivery_lon = models.FloatField('долгота доставки', blank=True, null=True)
+    delivery_lat = models.FloatField('широта доставки', blank=True, null=True)
+
+    @hook(BEFORE_CREATE)
+    @hook(BEFORE_UPDATE)
+    def create_geo_address(self):
+        self.restaurant_lon, self.restaurant_lat = fetch_coordinates(self.restaurant_address)
+        self.delivery_lon, self.delivery_lat = fetch_coordinates(self.delivery_address)
+
+    def __str__(self):
+        return f'{self.restaurant_address=}, {self.delivery_address=}'

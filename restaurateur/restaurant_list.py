@@ -51,31 +51,10 @@ def get_restaurants_and_distance(restaurants_list, delivery_address):
 
 
 def get_distance(restaurant_address, delivery_address):
-    try:
-        restaurant_location = Location.objects.get(restaurant_address=restaurant_address)
-        restaurant_lon = restaurant_location.restaurant_lon
-        restaurant_lat = restaurant_location.restaurant_lat
-    except ObjectDoesNotExist:
-        restaurant_lon, restaurant_lat = fetch_coordinates(restaurant_address)
-        restaurant_location = Location.objects.create(
-            restaurant_address=restaurant_address,
-            restaurant_lon=restaurant_lon,
-            restaurant_lat=restaurant_lat
-        )
-        restaurant_location.save()
+    location = Location.objects.get_or_create(restaurant_address=restaurant_address, delivery_address=delivery_address)
 
-    try:
-        delivery_location = Location.objects.get(delivery_address=delivery_address)
-        delivery_lon = delivery_location.delivery_lon
-        delivery_lat = delivery_location.delivery_lat
-    except ObjectDoesNotExist:
-        delivery_lon, delivery_lat = fetch_coordinates(delivery_address)
-        delivery_location = Location.objects.create(
-            delivery_address=delivery_address,
-            delivery_lon=delivery_lon,
-            delivery_lat=delivery_lat
-        )
-        delivery_location.save()
-
-    delivery_distance = distance.distance((float(restaurant_lat), float(restaurant_lon)), (float(delivery_lat), float(delivery_lon))).km
+    delivery_distance = distance.distance(
+        (float(location.restaurant_lat), float(location.restaurant_lon)),
+        (float(location.delivery_lat), float(location.delivery_lon))
+    ).km
     return '{:.2f} км.'.format(delivery_distance)
