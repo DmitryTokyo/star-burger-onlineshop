@@ -1,8 +1,6 @@
-from django.core.exceptions import ObjectDoesNotExist
 from geopy import distance
 
 from foodcartapp.models import Location
-from restaurateur.fetch_coordinates import fetch_coordinates
 
 
 def get_restaurants_and_delivery_distance(order, delivery_address):
