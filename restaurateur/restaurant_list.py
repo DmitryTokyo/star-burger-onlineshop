@@ -38,8 +38,8 @@ def sort_restaurants_by_products(restaurants):
     return restaurants_list
 
 
-def get_restaurants_and_distance(restaurants_list, delivery_address):
-    restaurants = []
+def get_restaurants_and_distance(restaurants_list: list, delivery_address: str):
+    restaurants: list[dict[str, str]] = []
     for restaurant in restaurants_list:
         restaurants.append({
             'name': restaurant.name,
@@ -48,11 +48,11 @@ def get_restaurants_and_distance(restaurants_list, delivery_address):
     return sorted(restaurants, key=lambda key: key['distance'])
 
 
-def get_distance(restaurant_address, delivery_address):
+def get_distance(restaurant_address: str, delivery_address: str) -> str:
     location = Location.objects.get_or_create(restaurant_address=restaurant_address, delivery_address=delivery_address)
 
     delivery_distance = distance.distance(
-        (float(location.restaurant_lat), float(location.restaurant_lon)),
-        (float(location.delivery_lat), float(location.delivery_lon))
+        (location.restaurant_lat, location.restaurant_lon),
+        (location.delivery_lat, location.delivery_lon)
     ).km
-    return '{:.2f} км.'.format(delivery_distance)
+    return f'{delivery_distance.km:.2f} км'
