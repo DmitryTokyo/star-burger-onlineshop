@@ -101,7 +101,7 @@ def view_restaurants(request):
 
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
-    orders = Order.objects.all().annotate(
+    orders = Order.objects.annotate(
         total_cost=Sum(F('order_items__product_cost')*F('order_items__quantity'), output_field=DecimalField())
     ).prefetch_related('order_items')
     order_items = []
