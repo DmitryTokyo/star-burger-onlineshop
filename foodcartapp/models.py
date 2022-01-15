@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db.models import Sum, F, DecimalField
 from django_lifecycle import hook, BEFORE_CREATE, BEFORE_UPDATE, LifecycleModelMixin
 from enumfields import EnumField
 from phonenumber_field.modelfields import PhoneNumberField
@@ -73,6 +74,13 @@ class RestaurantMenuItem(models.Model):
         ]
 
 
+class OrderQuerySet(models.QuerySet):
+    def total_cost(self):
+        return self.annotate(
+            total_cost=Sum(F('order_items__product_cost')*F('order_items__quantity'), output_field=DecimalField())
+        )
+
+
 class Order(models.Model):
     firstname = models.CharField('имя', max_length=50)
     lastname = models.CharField('фамилия', max_length=100)
@@ -84,6 +92,8 @@ class Order(models.Model):
     create_time = models.DateTimeField('заказ поступил', auto_now=True, blank=True)
     call_time = models.DateTimeField('связались с клиентом', blank=True, null=True)
     delivery_time = models.DateTimeField('заказ отправлен', blank=True, null=True)
+
+    objects = OrderQuerySet.as_manager()
 
     def __str__(self):
         return f'{self.lastname} {self.firstname}'
