@@ -1,3 +1,4 @@
+from django.core.signing import Signer, BadSignature
 from django.http import JsonResponse
 from django.db import transaction
 from rest_framework.decorators import api_view
@@ -45,6 +46,7 @@ def product_list_api(request):
 @api_view(['POST'])
 @transaction.atomic
 def register_order(request):
+    signer = Signer()
     serializer = OrderSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
 
@@ -55,7 +57,7 @@ def register_order(request):
         address=serializer.validated_data['address'],
     )
 
-    request.session[f'order_{order.pk}'] = order.pk
+    request.session[f'order_{order.pk}'] = signer.sign(order.pk)
 
     products_in_order = serializer.validated_data['order_items']
     order_products = [OrderItem(order=order, **fields) for fields in products_in_order]
@@ -70,11 +72,12 @@ def register_order(request):
 
 @api_view(['GET', 'DELETE', 'PATCH'])
 def handle_order_detail(request, pk):
+    signer = Signer()
     try:
-        request.session[f'order_{pk}']
-    except KeyError:
-        message = 'Your order does not in database. Please check order number again'
-        return Response({'message': message}, status=400)
+        signer.unsign(request.session[f'order_{pk}'])
+    except BadSignature:
+        message = 'Sorry, but we can recognize your request. Please try again'
+        return Response({'message': message}, status=401)
 
     try:
         order = Order.objects.get(pk=pk)
