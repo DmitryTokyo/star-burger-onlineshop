@@ -78,9 +78,9 @@ class Order(models.Model):
     lastname = models.CharField('фамилия', max_length=100)
     phonenumber = PhoneNumberField(verbose_name='телефон')
     address = models.CharField('адрес', max_length=150)
-    order_status = EnumField(OrderStatus, max_length=10, default=OrderStatus.incomplete, verbose_name='статус заказа')
+    order_status = EnumField(OrderStatus, max_length=20, default=OrderStatus.incomplete, verbose_name='статус заказа')
     comment = models.TextField('комментарии', blank=True)
-    payment_method = EnumField(PaymentMethod, max_length=4, verbose_name='метод оплаты')
+    payment_method = EnumField(PaymentMethod, max_length=20, verbose_name='метод оплаты')
     create_time = models.DateTimeField('заказ поступил', auto_now=True, blank=True)
     call_time = models.DateTimeField('связались с клиентом', blank=True, null=True)
     delivery_time = models.DateTimeField('заказ отправлен', blank=True, null=True)
@@ -93,7 +93,7 @@ class Order(models.Model):
         verbose_name_plural = 'заказы'
 
         indexes = [
-            models.Index(fields=['order_status'])
+            models.Index(fields=['order_status', 'create_time', 'call_time', 'delivery_time'])
         ]
 
 
