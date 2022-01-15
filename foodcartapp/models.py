@@ -1,9 +1,11 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
-from django_lifecycle import hook, BEFORE_CREATE, BEFORE_SAVE, BEFORE_UPDATE, LifecycleModelMixin
+from django_lifecycle import hook, BEFORE_CREATE, BEFORE_UPDATE, LifecycleModelMixin
+from enumfields import EnumField
 from phonenumber_field.modelfields import PhoneNumberField
 
+from foodcartapp.enums import OrderStatus, PaymentMethod
 from restaurateur.fetch_coordinates import fetch_coordinates
 
 
@@ -72,23 +74,13 @@ class RestaurantMenuItem(models.Model):
 
 
 class Order(models.Model):
-    ORDER_STATUS_CHOICES = [
-        ('UP', 'Необработанный'),
-        ('PR', 'Обработанный'),
-    ]
-    PAYMENT_METHOD = [
-        ('CA', 'Наличные'),
-        ('CC', 'Электронно')
-    ]
-
     firstname = models.CharField('имя', max_length=50)
     lastname = models.CharField('фамилия', max_length=100)
     phonenumber = PhoneNumberField(verbose_name='телефон')
     address = models.CharField('адрес', max_length=150)
-    order_status = models.CharField('статус', max_length=3, choices=ORDER_STATUS_CHOICES, default='Необработанный', db_index=True)
+    order_status = EnumField(OrderStatus, max_length=10, default=OrderStatus.incomplete, verbose_name='статус заказа')
     comment = models.TextField('комментарии', blank=True)
-    payment_method = models.CharField('тип оплаты', max_length=2, choices=PAYMENT_METHOD, default='Электронно')
-
+    payment_method = EnumField(PaymentMethod, max_length=4, verbose_name='метод оплаты')
     create_time = models.DateTimeField('заказ поступил', auto_now=True, blank=True)
     call_time = models.DateTimeField('связались с клиентом', blank=True, null=True)
     delivery_time = models.DateTimeField('заказ отправлен', blank=True, null=True)
@@ -99,6 +91,10 @@ class Order(models.Model):
     class Meta:
         verbose_name = 'заказ'
         verbose_name_plural = 'заказы'
+
+        indexes = [
+            models.Index(fields=['order_status'])
+        ]
 
 
 class OrderItem(models.Model):
