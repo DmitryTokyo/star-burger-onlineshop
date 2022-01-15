@@ -131,14 +131,18 @@ class OrderAdmin(admin.ModelAdmin):
     def response_change(self, request, obj):
         response = super(OrderAdmin, self).response_change(request, obj)
         allowed_hosts = settings.ALLOWED_HOSTS
-        
         try:
-            if not url_has_allowed_host_and_scheme(request.GET['next'], allowed_hosts=allowed_hosts):
+            has_url_allowed_host_and_scheme = url_has_allowed_host_and_scheme(\
+                request.GET['next'],
+                allowed_hosts=allowed_hosts,
+            )
+        except AttributeError:
+            return response
+        else:
+            if not has_url_allowed_host_and_scheme:
                 return response
             return HttpResponseRedirect(request.GET['next'])
-        except Exception:
-            return response
-        
+
     inlines = [
         OrderItemInline
     ]
