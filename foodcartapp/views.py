@@ -48,10 +48,6 @@ def register_order(request):
     serializer = OrderSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
 
-    if not serializer.validated_data['order_items']:
-        content = {'message': 'order_items can not be empty'}
-        return Response(content, status=400)
-
     order = Order.objects.create(
         firstname=serializer.validated_data['firstname'],
         lastname=serializer.validated_data['lastname'],
