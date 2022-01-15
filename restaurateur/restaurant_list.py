@@ -49,10 +49,10 @@ def get_restaurants_and_distance(restaurants_list: list, delivery_address: str):
 
 
 def get_distance(restaurant_address: str, delivery_address: str) -> str:
-    location = Location.objects.get_or_create(restaurant_address=restaurant_address, delivery_address=delivery_address)
+    location, _ = Location.objects.get_or_create(restaurant_address=restaurant_address, delivery_address=delivery_address)
 
     delivery_distance = distance.distance(
         (location.restaurant_lat, location.restaurant_lon),
         (location.delivery_lat, location.delivery_lon)
     ).km
-    return f'{delivery_distance.km:.2f} км'
+    return f'{delivery_distance:.2f} км'
