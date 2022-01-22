@@ -12,7 +12,7 @@ from django.contrib.auth import views as auth_views
 
 from foodcartapp.models import Product, Restaurant, RestaurantMenuItem
 from foodcartapp.models import Order
-from restaurateur.restaurant_list import get_restaurants_and_delivery_distance
+from restaurateur.fetch_restaurants_info import get_restaurants_and_delivery_distance
 
 
 class Login(forms.Form):
@@ -101,10 +101,10 @@ def view_restaurants(request):
 
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request):
-    orders = Order.objects.total_cost().prefetch_related('order_items')
+    orders = Order.objects.total_cost()
     order_items = []
     for order in orders:
-        restaurants = get_restaurants_and_delivery_distance(order, order.address)
+        restaurants = get_restaurants_and_delivery_distance(order)
         order_items.append({
             'id': order.id,
             'status': order.get_order_status_display(),
