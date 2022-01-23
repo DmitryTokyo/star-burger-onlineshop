@@ -1,9 +1,9 @@
 from django.urls import path
 
-from . import views
+from foodcartapp import views
 
 
-app_name = "foodcartapp"
+app_name = 'foodcartapp'
 
 urlpatterns = [
     path('products/', views.product_list_api),

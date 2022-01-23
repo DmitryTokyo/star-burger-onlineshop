@@ -1,7 +1,7 @@
 import os
-import environ
 
 import dj_database_url
+import environ
 
 env = environ.Env()
 
@@ -40,9 +40,11 @@ INSTALLED_APPS = [
 ]
 
 DEBUG_TOOLBAR_CONFIG = {
-        'DISABLE_PANELS': ['debug_toolbar.panels.redirects.RedirectsPanel'],
-        'SHOW_TEMPLATE_CONTEXT': True,
-    }
+    'DISABLE_PANELS': [
+        'debug_toolbar.panels.redirects.RedirectsPanel',
+    ],
+    'SHOW_TEMPLATE_CONTEXT': True,
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -59,7 +61,7 @@ REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
-    )
+    ),
 }
 
 ROOT_URLCONF = 'StarBurger.urls'
@@ -83,7 +85,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.join(BASE_DIR, "templates"),
+            os.path.join(BASE_DIR, 'templates'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -104,15 +106,15 @@ MEDIA_URL = '/media/'
 
 DATABASES = {
     'default': dj_database_url.config(
-        default='sqlite:////{0}'.format(os.path.join(BASE_DIR, 'db.sqlite3'))
-    )
+        default='sqlite:////{0}'.format(os.path.join(BASE_DIR, 'db.sqlite3')),
+    ),
 }
 
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
         'LOCATION': 'shop_cache_table',
-    }
+    },
 }
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -146,6 +148,6 @@ INTERNAL_IPS = ['127.0.0.1']
 
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "assets"),
-    os.path.join(BASE_DIR, "bundles"),
+    os.path.join(BASE_DIR, 'assets'),
+    os.path.join(BASE_DIR, 'bundles'),
 ]

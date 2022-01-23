@@ -1,7 +1,6 @@
-from django.contrib.auth.models import User
 from django.db import models
-from django.core.validators import MaxValueValidator, MinValueValidator
-from django.db.models import Sum, F, DecimalField
+from django.core.validators import MinValueValidator
+from django.db.models import Sum, F, DecimalField, QuerySet
 from django_lifecycle import hook, BEFORE_CREATE, BEFORE_UPDATE, LifecycleModelMixin
 from enumfields import EnumField
 from phonenumber_field.modelfields import PhoneNumberField
@@ -11,16 +10,16 @@ from restaurateur.fetch_coordinates import fetch_coordinates
 
 
 class Restaurant(models.Model):
+    class Meta:
+        verbose_name = 'ресторан'
+        verbose_name_plural = 'рестораны'
+
     name = models.CharField('название', max_length=50)
     address = models.CharField('адрес', max_length=100, blank=True)
     contact_phone = models.CharField('контактный телефон', max_length=50, blank=True)
 
     def __str__(self):
         return self.name
-
-    class Meta:
-        verbose_name = 'ресторан'
-        verbose_name_plural = 'рестораны'
 
 
 class ProductQuerySet(models.QuerySet):
@@ -29,20 +28,22 @@ class ProductQuerySet(models.QuerySet):
 
 
 class ProductCategory(models.Model):
-    name = models.CharField('название', max_length=50)
-
     class Meta:
         verbose_name = 'категория'
         verbose_name_plural = 'категории'
+
+    name = models.CharField('название', max_length=50)
 
     def __str__(self):
         return self.name
 
 
 class Product(models.Model):
+    class Meta:
+        verbose_name = 'товар'
+        verbose_name_plural = 'товары'
+
     name = models.CharField('название', max_length=50)
-    category = models.ForeignKey(ProductCategory, null=True, blank=True, on_delete=models.SET_NULL,
-                                 verbose_name='категория', related_name='products')
     price = models.DecimalField('цена', max_digits=8, decimal_places=2, validators=[MinValueValidator(0)])
     image = models.ImageField('картинка')
     special_status = models.BooleanField('спец.предложение', default=False, db_index=True)
@@ -50,38 +51,45 @@ class Product(models.Model):
 
     objects = ProductQuerySet.as_manager()
 
-    def __str__(self):
-        return self.name
+    category = models.ForeignKey(ProductCategory, null=True, blank=True, on_delete=models.SET_NULL,
+                                 verbose_name='категория', related_name='products')
 
-    class Meta:
-        verbose_name = 'товар'
-        verbose_name_plural = 'товары'
+    def __str__(self) -> str:
+        return self.name
 
 
 class RestaurantMenuItem(models.Model):
-    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE, related_name='menu_items') 
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='menu_items')
-    availability = models.BooleanField('в продаже', default=True, db_index=True)
-
-    def __str__(self):
-        return f"{self.restaurant.name} - {self.product.name}"
-
     class Meta:
         verbose_name = 'пункт меню ресторана'
         verbose_name_plural = 'пункты меню ресторана'
         unique_together = [
-            ['restaurant', 'product']
+            ['restaurant', 'product'],
         ]
+
+    availability = models.BooleanField('в продаже', default=True, db_index=True)
+    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE, related_name='menu_items')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='menu_items')
+
+    def __str__(self) -> str:
+        return f'{self.restaurant.name} - {self.product.name}'
 
 
 class OrderQuerySet(models.QuerySet):
-    def total_cost(self):
+    def total_cost(self) -> QuerySet:
         return self.annotate(
-            total_cost=Sum(F('order_items__product_cost')*F('order_items__quantity'), output_field=DecimalField())
+            total_cost=Sum(F('order_items__product_cost') * F('order_items__quantity'), output_field=DecimalField()),
         )
 
 
 class Order(models.Model):
+    class Meta:
+        verbose_name = 'заказ'
+        verbose_name_plural = 'заказы'
+
+        indexes = [
+            models.Index(fields=['order_status', 'create_time', 'call_time', 'delivery_time']),
+        ]
+
     firstname = models.CharField('имя', max_length=50)
     lastname = models.CharField('фамилия', max_length=100)
     phonenumber = PhoneNumberField(verbose_name='телефон')
@@ -95,27 +103,12 @@ class Order(models.Model):
 
     objects = OrderQuerySet.as_manager()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f'{self.lastname} {self.firstname}'
-
-    class Meta:
-        verbose_name = 'заказ'
-        verbose_name_plural = 'заказы'
-
-        indexes = [
-            models.Index(fields=['order_status', 'create_time', 'call_time', 'delivery_time'])
-        ]
 
 
 class OrderItem(models.Model):
-    product = models.ForeignKey(
-        Product,
-        on_delete=models.CASCADE,
-        related_name='order_items',
-        verbose_name='продукт',
-    )
     quantity = models.IntegerField('количество', validators=[MinValueValidator(1)])
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_items', verbose_name='заказ')
     product_cost = models.DecimalField(
         'стоимость 1ед',
         max_digits=8,
@@ -123,36 +116,43 @@ class OrderItem(models.Model):
         null=True,
         validators=[MinValueValidator(0)],
     )
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_items', verbose_name='заказ')
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name='order_items',
+        verbose_name='продукт',
+    )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.product.name
 
 
 class Banner(models.Model):
-    src = models.ImageField('баннер', upload_to='banners/')
-    title = models.CharField('название', max_length=200)
-    description = models.TextField('описание')
-    banner_order = models.PositiveIntegerField(default=0, verbose_name='место баннера', db_index=True)
-
-    def __str__(self):
-        return f'{self.title}'
-
     class Meta:
         ordering = ['banner_order']
         verbose_name = 'баннер'
         verbose_name_plural = 'баннеры'
 
+    src = models.ImageField('баннер', upload_to='banners/')
+    title = models.CharField('название', max_length=200)
+    description = models.TextField('описание')
+    banner_order = models.PositiveIntegerField(default=0, verbose_name='место баннера', db_index=True)
+
+    def __str__(self) -> str:
+        return f'{self.title}'
+
 
 class Location(LifecycleModelMixin, models.Model):
     class Meta:
         indexes = [
-            models.Index(fields=['restaurant_address', 'delivery_address'])
+            models.Index(fields=['restaurant_address', 'delivery_address']),
         ]
         constraints = [
             models.UniqueConstraint(
                 fields=['restaurant_address', 'delivery_address'],
-                name='unique_couple_addresses'
-            )
+                name='unique_couple_addresses',
+            ),
         ]
     restaurant_address = models.CharField('адрес ресторана', max_length=200)
     restaurant_lon = models.FloatField('долгота ресторана', blank=True, null=True)
@@ -161,11 +161,11 @@ class Location(LifecycleModelMixin, models.Model):
     delivery_lon = models.FloatField('долгота доставки', blank=True, null=True)
     delivery_lat = models.FloatField('широта доставки', blank=True, null=True)
 
+    def __str__(self) -> str:
+        return f'{self.restaurant_address=}, {self.delivery_address=}'
+
     @hook(BEFORE_CREATE)
     @hook(BEFORE_UPDATE)
-    def create_geo_address(self):
+    def create_geo_address(self) -> None:
         self.restaurant_lon, self.restaurant_lat = fetch_coordinates(self.restaurant_address)
         self.delivery_lon, self.delivery_lat = fetch_coordinates(self.delivery_address)
-
-    def __str__(self):
-        return f'{self.restaurant_address=}, {self.delivery_address=}'

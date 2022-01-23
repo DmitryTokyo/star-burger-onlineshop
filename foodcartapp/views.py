@@ -1,5 +1,5 @@
 from django.core.signing import Signer, BadSignature
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpRequest
 from django.db import transaction
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -9,13 +9,13 @@ from foodcartapp.serializers import OrderSerializer, BannerSerializer
 
 
 @api_view(['GET'])
-def banners_list_api(request):
+def banners_list_api(request: HttpRequest) -> Response:
     banners = Banner.objects.all()
     serializer = BannerSerializer(banners, many=True)
     return Response(serializer.data, status=200)
 
 
-def product_list_api(request):
+def product_list_api(request: HttpRequest) -> JsonResponse:
     products = Product.objects.select_related('category').available()
 
     dumped_products = []
@@ -34,7 +34,7 @@ def product_list_api(request):
             'restaurant': {
                 'id': product.id,
                 'name': product.name,
-            }
+            },
         }
         dumped_products.append(dumped_product)
     return JsonResponse(dumped_products, safe=False, json_dumps_params={
@@ -45,7 +45,7 @@ def product_list_api(request):
 
 @api_view(['POST'])
 @transaction.atomic
-def register_order(request):
+def register_order(request: HttpRequest) -> Response:
     signer = Signer()
     serializer = OrderSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
@@ -71,7 +71,7 @@ def register_order(request):
 
 
 @api_view(['GET', 'DELETE', 'PATCH'])
-def handle_order_detail(request, pk):
+def handle_order_detail(request: HttpRequest, pk: int) -> Response:  # noqa CFQ004
     signer = Signer()
     try:
         signer.unsign(request.session[f'order_{pk}'])
@@ -79,9 +79,8 @@ def handle_order_detail(request, pk):
         message = 'Sorry, but we can recognize your request. Please try again'
         return Response({'message': message}, status=401)
 
-    try:
-        order = Order.objects.get(pk=pk)
-    except Order.DoesNotExist:
+    order = Order.objects.filter(pk=pk).first()
+    if not order:
         return Response({'message': 'The order does not exist'}, status=404)
 
     if request.method == 'GET':

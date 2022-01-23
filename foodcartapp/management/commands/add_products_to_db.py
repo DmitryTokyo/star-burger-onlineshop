@@ -1,6 +1,6 @@
 from json import JSONDecodeError
 from pathlib import Path
-from typing import Any, BinaryIO
+from typing import Any
 
 import requests
 from django.core.files import File
@@ -12,9 +12,9 @@ from foodcartapp.models import Product, ProductCategory
 
 
 class Command(BaseCommand):
+    help: str = 'Add products to database from json url'  # noqa: A003, VNE003
     console: Console = Console()
     dry_run: bool = False
-    help: str = 'Add products to database from json url'
 
     def add_arguments(self, parser: Any) -> None:
         parser.add_argument('--products-json-url', type=str, help='Products json url')
@@ -58,7 +58,7 @@ class Command(BaseCommand):
                 name=product_info['title'],
                 price=product_info['price'],
                 image=photo_file,
-                category=ProductCategory.objects.filter(name=product_info['type']).first()
+                category=ProductCategory.objects.filter(name=product_info['type']).first(),
             )
             if self.dry_run:
                 self.console.print(f'This product might be add to db - {product}')
@@ -67,13 +67,14 @@ class Command(BaseCommand):
                 self.console.print(f'The product - {product} was added to db')
 
     def _get_photo_file(self, image_name: str) -> File | None:
-        image_file: BinaryIO | None = None
+        image_file: bytes | None = None
         image_path = Path(f'assets/{image_name}')
         if not image_path.is_file():
             return None
 
         try:
-            image_file = open(image_path, 'rb')
+            with open(image_path, 'rb') as file:
+                image_file = file.read()
         except OSError as e:
             self.console.print(f'Can not read the file: {image_path=}', style='red')
             self.console.print(f'Error: {str(e)}', style='red')

@@ -1,13 +1,13 @@
-from django.contrib import admin
-from django.utils.html import format_html
-from django.shortcuts import reverse
-from django.http import HttpResponseRedirect
-from django.utils.http import url_has_allowed_host_and_scheme
-from django.conf import settings
 from adminsortable2.admin import SortableAdminMixin
+from django.conf import settings
+from django.contrib import admin
+from django.http import HttpResponseRedirect, HttpRequest
+from django.shortcuts import reverse
+from django.utils.html import format_html
+from django.utils.http import url_has_allowed_host_and_scheme
+from django.utils.safestring import SafeString
 
-from .models import Restaurant, Product, RestaurantMenuItem, ProductCategory
-from foodcartapp.models import Order, OrderItem, Banner
+from foodcartapp.models import Restaurant, Product, RestaurantMenuItem, ProductCategory, Order, OrderItem, Banner
 
 
 class RestaurantMenuItemInline(admin.TabularInline):
@@ -28,12 +28,19 @@ class RestaurantAdmin(admin.ModelAdmin):
         'contact_phone',
     ]
     inlines = [
-        RestaurantMenuItemInline
+        RestaurantMenuItemInline,
     ]
 
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
+    class Media:
+        css = {
+            'all': (
+                'admin/foodcartapp.css',
+            ),
+        }
+
     list_display = [
         'get_image_list_preview',
         'name',
@@ -47,64 +54,57 @@ class ProductAdmin(admin.ModelAdmin):
         'category',
     ]
     search_fields = [
-        # FIXME SQLite can not convert letter case for cyrillic words properly, so search will be buggy.
-        # Migration to PostgreSQL is necessary
         'name',
         'category',
     ]
 
     inlines = [
-        RestaurantMenuItemInline
+        RestaurantMenuItemInline,
     ]
     fieldsets = (
-        ('Общее', {
-            'fields': [
-                'name',
-                'category',
-                'image',
-                'get_image_preview',
-                'price',
-            ]
-        }),
-        ('Подробно', {
-            'fields': [
-                'special_status',
-                'ingredients',
-            ],
-            'classes': [
-                'wide'
-            ],
-        }),
+        (
+            'Общее', {
+                'fields': [
+                    'name',
+                    'category',
+                    'image',
+                    'get_image_preview',
+                    'price',
+                ],
+            },
+        ),
+        (
+            'Подробно', {
+                'fields': [
+                    'special_status',
+                    'ingredients',
+                ],
+                'classes': [
+                    'wide',
+                ],
+            },
+        ),
     )
 
     readonly_fields = [
         'get_image_preview',
     ]
 
-    class Media:
-        css = {
-            "all": (
-                "admin/foodcartapp.css",
-            )
-        }
-
-    def get_image_preview(self, obj):
+    def get_image_preview(self, obj: Product) -> SafeString | str:
         if not obj.image:
             return 'выберите картинку'
         return format_html('<img src="{url}" height="200"/>', url=obj.image.url)
-    get_image_preview.short_description = 'превью'
 
-    def get_image_list_preview(self, obj):
+    def get_image_list_preview(self, obj: Product) -> SafeString | str:  # noqa CCE001
         if not obj.image or not obj.id:
             return 'нет картинки'
         edit_url = reverse('admin:foodcartapp_product_change', args=(obj.id,))
-        return format_html('<a href="{edit_url}"><img src="{src}" height="50"/></a>', edit_url=edit_url, src=obj.image.url)
+        return format_html(
+            '<a href="{edit_url}"><img src="{src}" height="50"/></a>', edit_url=edit_url, src=obj.image.url,
+        )
+
+    get_image_preview.short_description = 'превью'
     get_image_list_preview.short_description = 'превью'
-
-
-@admin.register(ProductCategory)
-class ProductAdmin(admin.ModelAdmin):
-    pass
 
 
 class OrderItemInline(admin.TabularInline):
@@ -125,14 +125,18 @@ class OrderAdmin(admin.ModelAdmin):
         'create_time',
         'call_time',
         'delivery_time',
-        ]
+    ]
     readonly_fields = ['create_time']
 
-    def response_change(self, request, obj):
+    inlines = [
+        OrderItemInline,
+    ]
+
+    def response_change(self, request: HttpRequest, obj: Order) -> HttpResponseRedirect:
         response = super(OrderAdmin, self).response_change(request, obj)
         allowed_hosts = settings.ALLOWED_HOSTS
         try:
-            has_url_allowed_host_and_scheme = url_has_allowed_host_and_scheme(\
+            has_url_allowed_host_and_scheme = url_has_allowed_host_and_scheme(
                 request.GET['next'],
                 allowed_hosts=allowed_hosts,
             )
@@ -143,10 +147,6 @@ class OrderAdmin(admin.ModelAdmin):
                 return response
             return HttpResponseRedirect(request.GET['next'])
 
-    inlines = [
-        OrderItemInline
-    ]
-
 
 @admin.register(Banner)
 class BannerAdmin(SortableAdminMixin, admin.ModelAdmin):
@@ -154,5 +154,8 @@ class BannerAdmin(SortableAdminMixin, admin.ModelAdmin):
     readonly_fields = ['preview_image']
     list_display = ['preview_image', 'title']
 
-    def preview_image(self, obj):
+    def preview_image(self, obj: Banner) -> SafeString:
         return format_html('<img src="{url}" width="250"/>', url=obj.src.url)
+
+
+admin.site.register(ProductCategory)
