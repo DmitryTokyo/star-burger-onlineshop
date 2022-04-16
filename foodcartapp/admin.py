@@ -34,13 +34,6 @@ class RestaurantAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    class Media:
-        css = {
-            'all': (
-                'admin/foodcartapp.css',
-            ),
-        }
-
     list_display = [
         'get_image_list_preview',
         'name',
@@ -89,6 +82,13 @@ class ProductAdmin(admin.ModelAdmin):
     readonly_fields = [
         'get_image_preview',
     ]
+
+    class Media:
+        css = {
+            'all': (
+                'admin/foodcartapp.css',
+            ),
+        }
 
     def get_image_preview(self, obj: Product) -> SafeString | str:
         if not obj.image:

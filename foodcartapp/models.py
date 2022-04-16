@@ -10,13 +10,13 @@ from restaurateur.fetch_coordinates import fetch_coordinates
 
 
 class Restaurant(models.Model):
-    class Meta:
-        verbose_name = 'ресторан'
-        verbose_name_plural = 'рестораны'
-
     name = models.CharField('название', max_length=50)
     address = models.CharField('адрес', max_length=100, blank=True)
     contact_phone = models.CharField('контактный телефон', max_length=50, blank=True)
+
+    class Meta:
+        verbose_name = 'ресторан'
+        verbose_name_plural = 'рестораны'
 
     def __str__(self):
         return self.name
@@ -28,21 +28,17 @@ class ProductQuerySet(models.QuerySet):
 
 
 class ProductCategory(models.Model):
+    name = models.CharField('название', max_length=50)
+
     class Meta:
         verbose_name = 'категория'
         verbose_name_plural = 'категории'
-
-    name = models.CharField('название', max_length=50)
 
     def __str__(self):
         return self.name
 
 
 class Product(models.Model):
-    class Meta:
-        verbose_name = 'товар'
-        verbose_name_plural = 'товары'
-
     name = models.CharField('название', max_length=50)
     price = models.DecimalField('цена', max_digits=8, decimal_places=2, validators=[MinValueValidator(0)])
     image = models.ImageField('картинка')
@@ -54,21 +50,25 @@ class Product(models.Model):
     category = models.ForeignKey(ProductCategory, null=True, blank=True, on_delete=models.SET_NULL,
                                  verbose_name='категория', related_name='products')
 
+    class Meta:
+        verbose_name = 'товар'
+        verbose_name_plural = 'товары'
+
     def __str__(self) -> str:
         return self.name
 
 
 class RestaurantMenuItem(models.Model):
+    availability = models.BooleanField('в продаже', default=True, db_index=True)
+    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE, related_name='menu_items')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='menu_items')
+
     class Meta:
         verbose_name = 'пункт меню ресторана'
         verbose_name_plural = 'пункты меню ресторана'
         unique_together = [
             ['restaurant', 'product'],
         ]
-
-    availability = models.BooleanField('в продаже', default=True, db_index=True)
-    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE, related_name='menu_items')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='menu_items')
 
     def __str__(self) -> str:
         return f'{self.restaurant.name} - {self.product.name}'
@@ -82,14 +82,6 @@ class OrderQuerySet(models.QuerySet):
 
 
 class Order(models.Model):
-    class Meta:
-        verbose_name = 'заказ'
-        verbose_name_plural = 'заказы'
-
-        indexes = [
-            models.Index(fields=['order_status', 'create_time', 'call_time', 'delivery_time']),
-        ]
-
     firstname = models.CharField('имя', max_length=50)
     lastname = models.CharField('фамилия', max_length=100)
     phonenumber = PhoneNumberField(verbose_name='телефон')
@@ -102,6 +94,14 @@ class Order(models.Model):
     delivery_time = models.DateTimeField('заказ отправлен', blank=True, null=True)
 
     objects = OrderQuerySet.as_manager()
+
+    class Meta:
+        verbose_name = 'заказ'
+        verbose_name_plural = 'заказы'
+
+        indexes = [
+            models.Index(fields=['order_status', 'create_time', 'call_time', 'delivery_time']),
+        ]
 
     def __str__(self) -> str:
         return f'{self.lastname} {self.firstname}'
@@ -129,21 +129,28 @@ class OrderItem(models.Model):
 
 
 class Banner(models.Model):
-    class Meta:
-        ordering = ['banner_order']
-        verbose_name = 'баннер'
-        verbose_name_plural = 'баннеры'
-
     src = models.ImageField('баннер', upload_to='banners/')
     title = models.CharField('название', max_length=200)
     description = models.TextField('описание')
     banner_order = models.PositiveIntegerField(default=0, verbose_name='место баннера', db_index=True)
+
+    class Meta:
+        ordering = ['banner_order']
+        verbose_name = 'баннер'
+        verbose_name_plural = 'баннеры'
 
     def __str__(self) -> str:
         return f'{self.title}'
 
 
 class Location(LifecycleModelMixin, models.Model):
+    restaurant_address = models.CharField('адрес ресторана', max_length=200)
+    restaurant_lon = models.FloatField('долгота ресторана', blank=True, null=True)
+    restaurant_lat = models.FloatField('широта ресторана', blank=True, null=True)
+    delivery_address = models.CharField('адрес доставки', max_length=200)
+    delivery_lon = models.FloatField('долгота доставки', blank=True, null=True)
+    delivery_lat = models.FloatField('широта доставки', blank=True, null=True)
+
     class Meta:
         indexes = [
             models.Index(fields=['restaurant_address', 'delivery_address']),
@@ -154,12 +161,6 @@ class Location(LifecycleModelMixin, models.Model):
                 name='unique_couple_addresses',
             ),
         ]
-    restaurant_address = models.CharField('адрес ресторана', max_length=200)
-    restaurant_lon = models.FloatField('долгота ресторана', blank=True, null=True)
-    restaurant_lat = models.FloatField('широта ресторана', blank=True, null=True)
-    delivery_address = models.CharField('адрес доставки', max_length=200)
-    delivery_lon = models.FloatField('долгота доставки', blank=True, null=True)
-    delivery_lat = models.FloatField('широта доставки', blank=True, null=True)
 
     def __str__(self) -> str:
         return f'{self.restaurant_address=}, {self.delivery_address=}'
