@@ -77,7 +77,7 @@ class RestaurantMenuItem(models.Model):
 class OrderQuerySet(models.QuerySet):
     def total_cost(self) -> QuerySet:
         return self.annotate(
-            total_cost=Sum(F('order_items__product_cost') * F('order_items__quantity'), output_field=DecimalField()),
+            total_cost=Sum(F('items__product_cost') * F('items__quantity'), output_field=DecimalField()),
         )
 
 
