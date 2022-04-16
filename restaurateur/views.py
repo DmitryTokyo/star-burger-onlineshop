@@ -16,7 +16,7 @@ from django.contrib.auth import views as auth_views
 
 from foodcartapp.models import Product, Restaurant
 from foodcartapp.models import Order
-from restaurateur.fetch_restaurants_info import get_restaurants_and_delivery_distance
+from restaurateur.services.restaurants import get_restaurants_and_delivery_distance
 
 
 class Login(forms.Form):
@@ -109,6 +109,7 @@ def view_orders(request: HttpRequest) -> HTTPResponse:
     order_items = []
     for order in orders:
         restaurants = get_restaurants_and_delivery_distance(order)
+        print(f'{restaurants=}')
         order_items.append({
             'id': order.id,
             'status': order.get_order_status_display(),
