@@ -115,7 +115,7 @@ class OrderItem(models.Model):
         decimal_places=2,
         validators=[MinValueValidator(0)],
     )
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_items', verbose_name='заказ')
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items', verbose_name='заказ')
     product = models.ForeignKey(
         Product,
         on_delete=models.CASCADE,
