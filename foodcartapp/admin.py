@@ -133,7 +133,7 @@ class OrderAdmin(admin.ModelAdmin):
     ]
 
     def response_change(self, request: HttpRequest, obj: Order) -> HttpResponseRedirect:
-        response = super(OrderAdmin, self).response_change(request, obj)
+        response = super().response_change(request, obj)
         allowed_hosts = settings.ALLOWED_HOSTS
         try:
             has_url_allowed_host_and_scheme = url_has_allowed_host_and_scheme(
