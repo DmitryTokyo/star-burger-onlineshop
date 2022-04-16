@@ -4,7 +4,7 @@ from django.conf import settings
 
 def fetch_coordinates(place: str) -> tuple[float, float]:
     base_url = 'https://geocode-maps.yandex.ru/1.x'
-    params = {'geocode': place, 'apikey': settings.APIKEY, 'format': 'json'}
+    params = {'geocode': place, 'apikey': settings.YANDEX_MAP_APIKEY, 'format': 'json'}
     response = requests.get(base_url, params=params)
     response.raise_for_status()
     places_found = response.json()['response']['GeoObjectCollection']['featureMember']

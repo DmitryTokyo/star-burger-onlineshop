@@ -60,7 +60,7 @@ pip install -r requirements.txt
 
 - DEBUG выставить True (по дефолту установлен False).
 - SECRET_KEY желательно задать собственный ключ, но в Development среде вы можете использовать дефолтное значение
-- APIKEY апи ключ от яндекс карт. Нужно получить на странице для разработчиков [Yandex maps](https://passport.yandex.ru/auth?origin=apikeys&retpath=https%3A%2F%2Fdeveloper.tech.yandex.ru%2F)
+- YANDEX_MAP_APIKEY апи ключ от яндекс карт. Нужно получить на странице для разработчиков [Yandex maps](https://passport.yandex.ru/auth?origin=apikeys&retpath=https%3A%2F%2Fdeveloper.tech.yandex.ru%2F)
 - ALLOWED_HOSTS при локальной разработке вы можете пользоваться дефолтным, но на проде необходимо прописать свои.
 
 Переменная окружения создается несколькими способами

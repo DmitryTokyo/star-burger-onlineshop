@@ -15,7 +15,7 @@ SECRET_KEY = env('SECRET_KEY', default='dev_key')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool('DEBUG', default=False)
 
-APIKEY = env('APIKEY')
+YANDEX_MAP_APIKEY = env('YANDEX_MAP_APIKEY')
 
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['127.0.0.1'])
 
