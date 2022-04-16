@@ -5,7 +5,7 @@ from foodcartapp.models import Location, Order
 
 
 def get_restaurants_and_delivery_distance(order: Order) -> list[dict[str, str]]:  # noqa FNE007
-    restaurants = order.order_items.filter(
+    restaurants = order.items.filter(
         product__menu_items__restaurant__isnull=False,
     ).values(
         name=F('product__menu_items__restaurant__name'),
