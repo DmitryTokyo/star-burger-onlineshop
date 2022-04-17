@@ -3,6 +3,7 @@ from typing import Any
 
 from django import forms
 from django.contrib.auth.models import User
+from django.db.models import Subquery, F
 from django.http import HttpRequest
 from django.shortcuts import redirect, render
 from django.views import View
@@ -14,7 +15,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
 
 
-from foodcartapp.models import Product, Restaurant
+from foodcartapp.models import Product, Restaurant, Location
 from foodcartapp.models import Order
 from restaurateur.services.restaurants import get_restaurants_and_delivery_distance
 
@@ -105,10 +106,22 @@ def view_restaurants(request: HttpRequest) -> HTTPResponse:
 
 @user_passes_test(is_manager, login_url='restaurateur:login')
 def view_orders(request: HttpRequest) -> HTTPResponse:
-    orders = Order.objects.total_cost()
+    orders = Order.objects.total_cost().filter(items__product__menu_items__restaurant__isnull=False)
+    restaurant_qs = Restaurant.objects.filter(
+        menu_items__product__order_items__order__id__in=orders.values_list('id', flat=True)
+    ).values(
+        'name',
+        'address',
+        order_id=F('menu_items__product__order_items__order__id')
+    )
+    location_qs = Location.objects.filter(
+        delivery_address__in=orders.values_list('address', flat=True),
+        restaurant_address__in=restaurant_qs.values_list('address', flat=True),
+    ).values()
     order_items = []
     for order in orders:
-        restaurants = get_restaurants_and_delivery_distance(order)
+        restaurants_data = list(filter(lambda r: order.id == r['order_id'], restaurant_qs))
+        restaurants = get_restaurants_and_delivery_distance(restaurants_data, order, location_qs)
         order_items.append({
             'id': order.id,
             'status': order.get_order_status_display(),
