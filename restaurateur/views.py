@@ -109,7 +109,6 @@ def view_orders(request: HttpRequest) -> HTTPResponse:
     order_items = []
     for order in orders:
         restaurants = get_restaurants_and_delivery_distance(order)
-        print(f'{restaurants=}')
         order_items.append({
             'id': order.id,
             'status': order.get_order_status_display(),
