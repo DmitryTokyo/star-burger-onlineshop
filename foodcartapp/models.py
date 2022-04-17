@@ -143,12 +143,12 @@ class Banner(models.Model):
 
 
 class Location(LifecycleModelMixin, models.Model):
-    restaurant_address = models.CharField('адрес ресторана', max_length=200)
-    restaurant_lon = models.FloatField('долгота ресторана', blank=True, null=True)
-    restaurant_lat = models.FloatField('широта ресторана', blank=True, null=True)
-    delivery_address = models.CharField('адрес доставки', max_length=200)
-    delivery_lon = models.FloatField('долгота доставки', blank=True, null=True)
-    delivery_lat = models.FloatField('широта доставки', blank=True, null=True)
+    restaurant_address = models.CharField('адрес', max_length=200)
+    restaurant_lon = models.FloatField('долгота', blank=True, null=True)
+    restaurant_lat = models.FloatField('широта', blank=True, null=True)
+    delivery_address = models.CharField('адрес', max_length=200)
+    delivery_lon = models.FloatField('долгота', blank=True, null=True)
+    delivery_lat = models.FloatField('широта', blank=True, null=True)
 
     class Meta:
         indexes = [
