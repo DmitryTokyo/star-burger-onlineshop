@@ -12,7 +12,6 @@ def get_restaurants_and_delivery_distance(
         order: Order,
         location_qs: QuerySet,
 ) -> list[dict[str, str]]:  # noqa FNE007
-    print(location_qs)
     for restaurant in restaurants_data:
         restaurant['distance'] = get_distance(restaurant['address'], order.address, location_qs)
 
