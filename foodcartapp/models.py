@@ -88,7 +88,7 @@ class Order(models.Model):
     address = models.CharField('адрес', max_length=150)
     order_status = EnumField(OrderStatus, max_length=20, default=OrderStatus.incomplete, verbose_name='статус заказа')
     comment = models.TextField('комментарии', blank=True)
-    payment_method = EnumField(PaymentMethod, max_length=20, default=PaymentMethod.card, verbose_name='метод оплаты')
+    payment_method = EnumField(PaymentMethod, max_length=20, verbose_name='метод оплаты')
     create_time = models.DateTimeField('заказ поступил', auto_now=True, blank=True)
     call_time = models.DateTimeField('связались с клиентом', blank=True, null=True)
     delivery_time = models.DateTimeField('заказ отправлен', blank=True, null=True)
