@@ -100,7 +100,7 @@ class Order(models.Model):
         verbose_name_plural = 'заказы'
 
         indexes = [
-            models.Index(fields=['order_status', 'create_time', 'call_time', 'delivery_time']),
+            models.Index(fields=['order_status', 'create_time', 'call_time', 'delivery_time', 'phonenumber']),
         ]
 
     def __str__(self) -> str:
