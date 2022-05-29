@@ -107,7 +107,7 @@ npm install --dev
 Установите [Parcel](https://parceljs.org/). Это упаковщик веб-приложений.
 
 ```sh
-npm install -g parcel-bundler  # понадобятся права администратора `sudo`
+sudo npm install -g parcel-bundler  # понадобятся права администратора `sudo`
 ```
 
 Проверьте, что `parcel` установлен. Запустите его в командной строке:
