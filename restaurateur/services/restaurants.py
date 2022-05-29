@@ -1,4 +1,3 @@
-from typing import Mapping
 from django.forms.models import model_to_dict
 
 from django.db.models import QuerySet
@@ -7,11 +6,11 @@ from geopy import distance
 from foodcartapp.models import Location, Order
 
 
-def get_restaurants_and_delivery_distance(
+def get_restaurants_and_delivery_distance(  # noqa FNE007
         restaurants_data: list[dict],
         order: Order,
         location_qs: QuerySet,
-) -> list[dict[str, str]]:  # noqa FNE007
+) -> list[dict[str, str]]:
     for restaurant in restaurants_data:
         restaurant['distance'] = get_distance(restaurant['address'], order.address, location_qs)
 
@@ -19,7 +18,13 @@ def get_restaurants_and_delivery_distance(
 
 
 def get_distance(restaurant_address: str, delivery_address: str, location_qs: QuerySet) -> str:
-    filtered_location = list(filter(lambda l: l['restaurant_address'] == restaurant_address and l['delivery_address'] == delivery_address, location_qs))
+    filtered_location = list(
+        filter(
+            lambda l:
+            l['restaurant_address'] == restaurant_address and l['delivery_address'] == delivery_address,
+            location_qs,
+        ),
+    )
     location = filtered_location[0] if filtered_location else None
     if not location:
         location_obj, _ = Location.objects.create(
