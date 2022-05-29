@@ -88,7 +88,7 @@ class CheckoutModal extends Component{
               <label htmlFor="payment_method">Метод оплаты</label>
                 <select className="form-control" onChange={this.savePaymentMethod}>
                   <option value="cache">--------</option>
-                  <option value="cache">Наличные</option>
+                  <option value="cash">Наличные</option>
                   <option value="card">Оплата картой</option>
                 </select>
             </div>
