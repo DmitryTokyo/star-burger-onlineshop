@@ -7,5 +7,5 @@ class OrderStatus(Enum):
 
 
 class PaymentMethod(Enum):
-    cash = 'наличные'
-    card = 'банковской картой'
+    cash = 'cash'
+    card = 'card'

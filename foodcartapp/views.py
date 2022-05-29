@@ -1,7 +1,8 @@
 from django.core.signing import Signer, BadSignature
-from django.http import JsonResponse, HttpRequest
+from django.http import JsonResponse
 from django.db import transaction
 from rest_framework.decorators import api_view
+from rest_framework.request import Request
 from rest_framework.response import Response
 
 from foodcartapp.models import Product, OrderItem, Order, Banner
@@ -9,13 +10,13 @@ from foodcartapp.serializers import OrderSerializer, BannerSerializer
 
 
 @api_view(['GET'])
-def banners_list_api(request: HttpRequest) -> Response:
+def banners_list_api(request: Request) -> Response:
     banners = Banner.objects.all()
     serializer = BannerSerializer(banners, many=True)
     return Response(serializer.data, status=200)
 
 
-def product_list_api(request: HttpRequest) -> JsonResponse:
+def product_list_api(request: Request) -> JsonResponse:
     products = Product.objects.select_related('category').available()
 
     dumped_products = []
@@ -45,7 +46,7 @@ def product_list_api(request: HttpRequest) -> JsonResponse:
 
 @api_view(['POST'])
 @transaction.atomic
-def register_order(request: HttpRequest) -> Response:
+def register_order(request: Request) -> Response:
     signer = Signer()
     serializer = OrderSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
@@ -55,6 +56,7 @@ def register_order(request: HttpRequest) -> Response:
         lastname=serializer.validated_data['lastname'],
         phonenumber=serializer.validated_data['phonenumber'],
         address=serializer.validated_data['address'],
+        payment_method=serializer.validated_data['payment_method'],
     )
 
     request.session[f'order_{order.pk}'] = signer.sign(order.pk)
@@ -71,7 +73,7 @@ def register_order(request: HttpRequest) -> Response:
 
 
 @api_view(['GET', 'DELETE', 'PATCH'])
-def handle_order_detail(request: HttpRequest, pk: int) -> Response:  # noqa CFQ004
+def handle_order_detail(request: Request, pk: int) -> Response:  # noqa CFQ004
     signer = Signer()
     try:
         signer.unsign(request.session[f'order_{pk}'])

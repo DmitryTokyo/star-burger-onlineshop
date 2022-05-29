@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from enumfields.drf.serializers import EnumSerializerField, EnumSupportSerializerMixin
+from foodcartapp.enums import PaymentMethod
 from foodcartapp.models import Order, OrderItem, Banner
 
 
@@ -8,12 +10,12 @@ class OrderItemSerializer(serializers.ModelSerializer):
         fields = ['product', 'quantity']
 
 
-class OrderSerializer(serializers.ModelSerializer):
+class OrderSerializer(EnumSupportSerializerMixin, serializers.ModelSerializer):
     products = OrderItemSerializer(many=True, write_only=True, allow_empty=False, source='order_items')
 
     class Meta:
         model = Order
-        fields = ['id', 'firstname', 'lastname', 'phonenumber', 'address', 'products']
+        fields = ['id', 'firstname', 'lastname', 'phonenumber', 'address', 'products', 'payment_method']
 
 
 class BannerSerializer(serializers.ModelSerializer):
