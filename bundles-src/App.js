@@ -47,7 +47,8 @@ class App extends Component {
     this.setState({checkoutModalActive: false});
   }
 
-  async handleCheckout({firstname, lastname, phonenumber, address}){
+  async handleCheckout({firstname, lastname, phonenumber, address, payment_method}){
+    console.log(payment_method)
     const url = "api/order/";
     let data = {
       'products': this.state.cart.map(item=>({
@@ -57,7 +58,8 @@ class App extends Component {
       firstname,
       lastname,
       phonenumber,
-      address
+      address,
+      payment_method,
     };
 
     let csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
@@ -89,7 +91,7 @@ class App extends Component {
     } catch(error){
       alert('Ошибка при оформлении заказа. Попробуйте ещё раз или свяжитесь с нами по телефону.');
       throw error;
-    };
+    }
   }
 
 

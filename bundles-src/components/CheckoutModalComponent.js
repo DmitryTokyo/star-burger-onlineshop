@@ -8,6 +8,7 @@ class CheckoutModal extends Component{
     lastname: "",
     phonenumber: "",
     address: "",
+    payment_method: "",
     waitTillCheckoutEnds: false,
   }
 
@@ -37,6 +38,13 @@ class CheckoutModal extends Component{
     this.setState({
       address : value
     });
+  }
+
+  savePaymentMethod = event => {
+    const {target : {value}} = event;
+     this.setState({
+       payment_method: value
+     })
   }
 
   async submit(event){
@@ -77,6 +85,12 @@ class CheckoutModal extends Component{
               <input onChange={this.savePhonenumber} required id="phonenumber" maxLength="20" type="text" className="form-control" placeholder="+7 901 ..."/><br/>
               <label htmlFor="address">Адрес доставки:</label>
               <input onChange={this.saveAddress} required id="address" type="text" maxLength="256" className="form-control" placeholder="Город, улица, дом"/><br/>
+              <label htmlFor="payment_method">Метод оплаты</label>
+                <select className="form-control" onChange={this.savePaymentMethod}>
+                  <option value="cache">--------</option>
+                  <option value="cache">Наличные</option>
+                  <option value="card">Оплата картой</option>
+                </select>
             </div>
           </Modal.Body>
           <Modal.Footer>
