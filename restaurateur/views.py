@@ -3,7 +3,7 @@ from typing import Any
 
 from django import forms
 from django.contrib.auth.models import User
-from django.db.models import Subquery, F
+from django.db.models import F
 from django.http import HttpRequest
 from django.shortcuts import redirect, render
 from django.views import View
@@ -108,11 +108,11 @@ def view_restaurants(request: HttpRequest) -> HTTPResponse:
 def view_orders(request: HttpRequest) -> HTTPResponse:
     orders = Order.objects.total_cost().filter(items__product__menu_items__restaurant__isnull=False)
     restaurant_qs = Restaurant.objects.filter(
-        menu_items__product__order_items__order__id__in=orders.values_list('id', flat=True)
+        menu_items__product__order_items__order__id__in=orders.values_list('id', flat=True),
     ).values(
         'name',
         'address',
-        order_id=F('menu_items__product__order_items__order__id')
+        order_id=F('menu_items__product__order_items__order__id'),
     )
     location_qs = Location.objects.filter(
         delivery_address__in=orders.values_list('address', flat=True),
