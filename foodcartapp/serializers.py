@@ -1,6 +1,5 @@
 from rest_framework import serializers
-from enumfields.drf.serializers import EnumSerializerField, EnumSupportSerializerMixin
-from foodcartapp.enums import PaymentMethod
+from enumfields.drf.serializers import EnumSupportSerializerMixin
 from foodcartapp.models import Order, OrderItem, Banner
 
 
