@@ -86,8 +86,8 @@ class CheckoutModal extends Component{
               <label htmlFor="address">Адрес доставки:</label>
               <input onChange={this.saveAddress} required id="address" type="text" maxLength="256" className="form-control" placeholder="Город, улица, дом"/><br/>
               <label htmlFor="payment_method">Метод оплаты</label>
-                <select className="form-control" onChange={this.savePaymentMethod}>
-                  <option value="cache">--------</option>
+                <select className="form-control" onChange={this.savePaymentMethod} id="payment_method" required>
+                  <option value="">--------</option>
                   <option value="cash">Наличные</option>
                   <option value="card">Оплата картой</option>
                 </select>
