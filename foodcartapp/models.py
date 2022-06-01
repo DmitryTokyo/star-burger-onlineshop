@@ -13,13 +13,22 @@ class Restaurant(models.Model):
     name = models.CharField('название', max_length=50)
     address = models.CharField('адрес', max_length=100, blank=True)
     contact_phone = models.CharField('контактный телефон', max_length=50, blank=True)
+    longitude = models.FloatField('долгота', blank=True, null=True)
+    latitude = models.FloatField('широта', blank=True, null=True)
 
     class Meta:
         verbose_name = 'ресторан'
         verbose_name_plural = 'рестораны'
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
+
+    @property
+    def coordinates(self) -> tuple[float | None, float | None]:
+        if not self.longitude and not self.latitude:
+            self.longitude, self.latitude = fetch_coordinates(self.address)
+
+        return self.longitude, self.latitude
 
 
 class ProductQuerySet(models.QuerySet):
@@ -34,7 +43,7 @@ class ProductCategory(models.Model):
         verbose_name = 'категория'
         verbose_name_plural = 'категории'
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
