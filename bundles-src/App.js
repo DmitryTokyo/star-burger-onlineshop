@@ -48,7 +48,6 @@ class App extends Component {
   }
 
   async handleCheckout({firstname, lastname, phonenumber, address, payment_method}){
-    console.log(payment_method)
     const url = "api/order/";
     let data = {
       'products': this.state.cart.map(item=>({
