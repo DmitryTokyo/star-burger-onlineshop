@@ -1,7 +1,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator
 from django.db.models import Sum, F, DecimalField, QuerySet
-from django_lifecycle import hook, BEFORE_CREATE, BEFORE_UPDATE, LifecycleModelMixin
 from enumfields import EnumField
 from phonenumber_field.modelfields import PhoneNumberField
 
