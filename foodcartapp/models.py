@@ -27,6 +27,7 @@ class Restaurant(models.Model):
     def coordinates(self) -> tuple[float | None, float | None]:
         if not self.longitude and not self.latitude:
             self.longitude, self.latitude = fetch_coordinates(self.address)
+            self.save()
 
         return self.longitude, self.latitude
 
@@ -83,6 +84,28 @@ class RestaurantMenuItem(models.Model):
         return f'{self.restaurant.name} - {self.product.name}'
 
 
+class DeliveryLocation(models.Model):
+    address = models.CharField('адрес', max_length=200)
+    longitude = models.FloatField('долгота', blank=True, null=True)
+    latitude = models.FloatField('широта', blank=True, null=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['address']),
+        ]
+
+    def __str__(self) -> str:
+        return self.address
+
+    @property
+    def coordinates(self) -> tuple[float | None, float | None]:
+        if not self.longitude and not self.latitude:
+            self.longitude, self.latitude = fetch_coordinates(self.address)
+            self.save()
+
+        return self.longitude, self.latitude
+
+
 class OrderQuerySet(models.QuerySet):
     def total_cost(self) -> QuerySet:
         return self.annotate(
@@ -101,6 +124,7 @@ class Order(models.Model):
     create_time = models.DateTimeField('заказ поступил', auto_now=True, blank=True)
     call_time = models.DateTimeField('связались с клиентом', blank=True, null=True)
     delivery_time = models.DateTimeField('заказ отправлен', blank=True, null=True)
+    delivery_location = models.ForeignKey(DeliveryLocation, on_delete=models.SET_NULL, null=True, blank=True)
 
     objects = OrderQuerySet.as_manager()
 

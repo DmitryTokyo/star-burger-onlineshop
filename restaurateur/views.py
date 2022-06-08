@@ -15,7 +15,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
 
 
-from foodcartapp.models import Product, Restaurant, Location
+from foodcartapp.models import Product, Restaurant, Location, DeliveryLocation
 from foodcartapp.models import Order
 from restaurateur.services.restaurants import get_restaurants_and_delivery_distance
 
@@ -110,18 +110,21 @@ def view_orders(request: HttpRequest) -> HTTPResponse:
     restaurant_qs = Restaurant.objects.filter(
         menu_items__product__order_items__order__id__in=orders.values_list('id', flat=True),
     ).values(
+        'id',
         'name',
         'address',
+        'longitude',
+        'latitude',
         order_id=F('menu_items__product__order_items__order__id'),
     )
-    location_qs = Location.objects.filter(
-        delivery_address__in=orders.values_list('address', flat=True),
-        restaurant_address__in=restaurant_qs.values_list('address', flat=True),
-    ).values()
+
+    delivery_location_qs = DeliveryLocation.objects.filter(
+        address__in=orders.values_list('address', flat=True),
+    ).values('address', 'longitude', 'latitude')
     order_items = []
     for order in orders:
         restaurants_data = list(filter(lambda r: order.id == r['order_id'], restaurant_qs))
-        restaurants = get_restaurants_and_delivery_distance(restaurants_data, order, location_qs)
+        restaurants = get_restaurants_and_delivery_distance(restaurants_data, order, delivery_location_qs)
         order_items.append({
             'id': order.id,
             'status': order.get_order_status_display(),
