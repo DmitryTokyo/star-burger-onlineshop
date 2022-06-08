@@ -3,7 +3,7 @@ from django.forms.models import model_to_dict
 from django.db.models import QuerySet
 from geopy import distance
 
-from foodcartapp.models import Location, Order, Restaurant, DeliveryLocation
+from foodcartapp.models import Order, Restaurant, DeliveryLocation
 
 
 def get_restaurants_and_delivery_distance(  # noqa FNE007

@@ -173,32 +173,3 @@ class Banner(models.Model):
 
     def __str__(self) -> str:
         return f'{self.title}'
-
-
-class Location(LifecycleModelMixin, models.Model):
-    restaurant_address = models.CharField('адрес', max_length=200)
-    restaurant_lon = models.FloatField('долгота', blank=True, null=True)
-    restaurant_lat = models.FloatField('широта', blank=True, null=True)
-    delivery_address = models.CharField('адрес', max_length=200)
-    delivery_lon = models.FloatField('долгота', blank=True, null=True)
-    delivery_lat = models.FloatField('широта', blank=True, null=True)
-
-    class Meta:
-        indexes = [
-            models.Index(fields=['restaurant_address', 'delivery_address']),
-        ]
-        constraints = [
-            models.UniqueConstraint(
-                fields=['restaurant_address', 'delivery_address'],
-                name='unique_couple_addresses',
-            ),
-        ]
-
-    def __str__(self) -> str:
-        return f'{self.restaurant_address=}, {self.delivery_address=}'
-
-    @hook(BEFORE_CREATE)
-    @hook(BEFORE_UPDATE)
-    def create_geo_address(self) -> None:
-        self.restaurant_lon, self.restaurant_lat = fetch_coordinates(self.restaurant_address)
-        self.delivery_lon, self.delivery_lat = fetch_coordinates(self.delivery_address)

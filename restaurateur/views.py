@@ -15,7 +15,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
 
 
-from foodcartapp.models import Product, Restaurant, Location, DeliveryLocation
+from foodcartapp.models import Product, Restaurant, DeliveryLocation
 from foodcartapp.models import Order
 from restaurateur.services.restaurants import get_restaurants_and_delivery_distance
 
