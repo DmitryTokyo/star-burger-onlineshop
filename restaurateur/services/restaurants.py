@@ -7,14 +7,14 @@ from foodcartapp.models import Order, Restaurant, DeliveryLocation
 
 
 def get_restaurants_and_delivery_distance(  # noqa FNE007
-        restaurants_data: list[dict],
+        restaurants_for_order: list[dict],
         order: Order,
         delivery_location_qs: QuerySet,
 ) -> list[dict[str, str]]:
-    for restaurant in restaurants_data:
+    for restaurant in restaurants_for_order:
         restaurant['distance'] = get_distance(restaurant, order.address, delivery_location_qs)
 
-    return sorted(restaurants_data, key=lambda key: key['distance'])
+    return sorted(restaurants_for_order, key=lambda key: key['distance'])
 
 
 def get_distance(restaurant: dict, order_address: str, delivery_location_qs: QuerySet) -> str:

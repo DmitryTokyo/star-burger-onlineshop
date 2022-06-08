@@ -123,8 +123,8 @@ def view_orders(request: HttpRequest) -> HTTPResponse:
     ).values('address', 'longitude', 'latitude')
     order_items = []
     for order in orders:
-        restaurants_data = list(filter(lambda r: order.id == r['order_id'], restaurant_qs))
-        restaurants = get_restaurants_and_delivery_distance(restaurants_data, order, delivery_location_qs)
+        restaurants_for_order = list(filter(lambda r: order.id == r['order_id'], restaurant_qs))
+        restaurants = get_restaurants_and_delivery_distance(restaurants_for_order, order, delivery_location_qs)
         order_items.append({
             'id': order.id,
             'status': order.get_order_status_display(),
