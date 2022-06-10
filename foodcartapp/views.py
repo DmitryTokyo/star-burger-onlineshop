@@ -1,7 +1,11 @@
+from typing import Any
+
 from django.core.signing import Signer, BadSignature
 from django.http import JsonResponse
 from django.db import transaction
+from rest_framework import status
 from rest_framework.decorators import api_view
+from rest_framework.generics import ListAPIView, ListCreateAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 
@@ -9,11 +13,13 @@ from foodcartapp.models import Product, OrderItem, Order, Banner
 from foodcartapp.serializers import OrderSerializer, BannerSerializer
 
 
-@api_view(['GET'])
-def banners_list_api(request: Request) -> Response:
-    banners = Banner.objects.all()
-    serializer = BannerSerializer(banners, many=True)
-    return Response(serializer.data, status=200)
+class BannersListViews(ListAPIView):
+    serializer_class = BannerSerializer
+
+    def get(self, request: Request, *args: Any, **kwargs: Any):
+        banners = Banner.objects.all()
+        serializer = BannerSerializer(banners, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 def product_list_api(request: Request) -> JsonResponse:

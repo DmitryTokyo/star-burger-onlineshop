@@ -7,7 +7,7 @@ app_name = 'foodcartapp'
 
 urlpatterns = [
     path('products/', views.product_list_api),
-    path('banners/', views.banners_list_api),
+    path('banners/', views.BannersListViews.as_view(), name='banners_list'),
     path('order/', views.register_order),
     path('order/<int:pk>/', views.handle_order_detail),
 ]
