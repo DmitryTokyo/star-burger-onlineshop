@@ -5,7 +5,7 @@ from django.http import JsonResponse
 from django.db import transaction
 from rest_framework import status
 from rest_framework.decorators import api_view
-from rest_framework.generics import ListAPIView, ListCreateAPIView
+from rest_framework.generics import ListAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -23,32 +23,34 @@ class BannersListViews(ListAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-def product_list_api(request: Request) -> JsonResponse:
-    products = Product.objects.select_related('category').available()
+class ProductsListApiViews(APIView):
 
-    dumped_products = []
-    for product in products:
-        dumped_product = {
-            'id': product.id,
-            'name': product.name,
-            'price': product.price,
-            'special_status': product.special_status,
-            'ingredients': product.ingredients,
-            'category': {
-                'id': product.category.id,
-                'name': product.category.name,
-            },
-            'image': product.image.url,
-            'restaurant': {
+    def get(self, request: Request, *args: Any, **kwargs: Any) -> JsonResponse:
+        products = Product.objects.select_related('category').available()
+
+        dumped_products = []
+        for product in products:
+            dumped_product = {
                 'id': product.id,
                 'name': product.name,
-            },
-        }
-        dumped_products.append(dumped_product)
-    return JsonResponse(dumped_products, safe=False, json_dumps_params={
-        'ensure_ascii': False,
-        'indent': 4,
-    })
+                'price': product.price,
+                'special_status': product.special_status,
+                'ingredients': product.ingredients,
+                'category': {
+                    'id': product.category.id,
+                    'name': product.category.name,
+                },
+                'image': product.image.url,
+                'restaurant': {
+                    'id': product.id,
+                    'name': product.name,
+                },
+            }
+            dumped_products.append(dumped_product)
+        return JsonResponse(dumped_products, safe=False, json_dumps_params={
+            'ensure_ascii': False,
+            'indent': 4,
+        })
 
 
 @api_view(['POST'])
