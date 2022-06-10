@@ -8,6 +8,7 @@ from rest_framework.decorators import api_view
 from rest_framework.generics import ListAPIView, ListCreateAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from foodcartapp.models import Product, OrderItem, Order, Banner
 from foodcartapp.serializers import OrderSerializer, BannerSerializer
@@ -16,7 +17,7 @@ from foodcartapp.serializers import OrderSerializer, BannerSerializer
 class BannersListViews(ListAPIView):
     serializer_class = BannerSerializer
 
-    def get(self, request: Request, *args: Any, **kwargs: Any):
+    def get(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         banners = Banner.objects.all()
         serializer = BannerSerializer(banners, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
