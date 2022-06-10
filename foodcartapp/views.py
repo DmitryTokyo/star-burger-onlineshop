@@ -5,7 +5,7 @@ from django.http import JsonResponse
 from django.db import transaction
 from rest_framework import status
 from rest_framework.decorators import api_view
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -53,32 +53,34 @@ class ProductsListApiViews(APIView):
         })
 
 
-@api_view(['POST'])
-@transaction.atomic
-def register_order(request: Request) -> Response:
-    signer = Signer()
-    serializer = OrderSerializer(data=request.data)
-    serializer.is_valid(raise_exception=True)
+class RegisterOrderViews(CreateAPIView):
+    serializer_class = OrderSerializer
 
-    order = Order.objects.create(
-        firstname=serializer.validated_data['firstname'],
-        lastname=serializer.validated_data['lastname'],
-        phonenumber=serializer.validated_data['phonenumber'],
-        address=serializer.validated_data['address'],
-        payment_method=serializer.validated_data['payment_method'],
-    )
+    @transaction.atomic
+    def post(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        signer = Signer()
+        serializer = OrderSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-    request.session[f'order_{order.pk}'] = signer.sign(order.pk)
+        order = Order.objects.create(
+            firstname=serializer.validated_data['firstname'],
+            lastname=serializer.validated_data['lastname'],
+            phonenumber=serializer.validated_data['phonenumber'],
+            address=serializer.validated_data['address'],
+            payment_method=serializer.validated_data['payment_method'],
+        )
 
-    products_in_order = serializer.validated_data['order_items']
-    order_products = [OrderItem(order=order, **fields) for fields in products_in_order]
+        request.session[f'order_{order.pk}'] = signer.sign(order.pk)
 
-    for order_product in order_products:
-        order_product.product_cost = order_product.product.price
+        products_in_order = serializer.validated_data['order_items']
+        order_products = [OrderItem(order=order, **fields) for fields in products_in_order]
 
-    OrderItem.objects.bulk_create(order_products)
+        for order_product in order_products:
+            order_product.product_cost = order_product.product.price
 
-    return Response(serializer.data, status=201)
+        OrderItem.objects.bulk_create(order_products)
+
+        return Response(serializer.data, status=201)
 
 
 @api_view(['GET', 'DELETE', 'PATCH'])
