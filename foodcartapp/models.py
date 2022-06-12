@@ -171,4 +171,4 @@ class Banner(models.Model):
         verbose_name_plural = 'баннеры'
 
     def __str__(self) -> str:
-        return f'{self.title}'
+        return self.title
