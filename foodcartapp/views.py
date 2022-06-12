@@ -1,17 +1,17 @@
 from typing import Any
 
-from django.core.signing import Signer, BadSignature
+from django.core.signing import Signer
 from django.http import JsonResponse
 from django.db import transaction
 from rest_framework import status
-from rest_framework.decorators import api_view
-from rest_framework.generics import ListAPIView, CreateAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from foodcartapp.models import Product, OrderItem, Order, Banner
 from foodcartapp.serializers import OrderSerializer, BannerSerializer
+from foodcartapp.view_mixins import AllowOrderMixin
 
 
 class BannersListViews(ListAPIView):
@@ -80,32 +80,33 @@ class RegisterOrderViews(CreateAPIView):
 
         OrderItem.objects.bulk_create(order_products)
 
-        return Response(serializer.data, status=201)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-@api_view(['GET', 'DELETE', 'PATCH'])
-def handle_order_detail(request: Request, pk: int) -> Response:  # noqa CFQ004
-    signer = Signer()
-    try:
-        signer.unsign(request.session[f'order_{pk}'])
-    except BadSignature:
-        message = 'Sorry, but we can recognize your request. Please try again'
-        return Response({'message': message}, status=401)
+class OrderDetailsView(AllowOrderMixin, RetrieveUpdateDestroyAPIView):
+    serializer_class = OrderSerializer
+    allowed_methods = ['get', 'patch', 'delete']
 
-    order = Order.objects.filter(pk=pk).first()
-    if not order:
-        return Response({'message': 'The order does not exist'}, status=404)
-
-    if request.method == 'GET':
-        serializer = OrderSerializer(order)
-        return Response(serializer.data)
-
-    if request.method == 'DELETE':
-        order.delete()
-        return Response({'message': 'The order was deleted successfully!'}, status=204)
-
-    if request.method == 'PATCH':
+    def patch(self, request: Request, *args: Any, ** kwargs: Any) -> Response:
+        order = self.get_object()
         serializer = OrderSerializer(order, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(serializer.data, status=201)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def get(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        order = self.get_object()
+        serializer = OrderSerializer(order)
+        return Response(serializer.data)
+
+    def delete(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        order = self.get_object()
+        order.delete()
+        return Response({'message': 'The order was deleted successfully!'}, status=status.HTTP_204_NO_CONTENT)
+
+    def get_object(self, **kwargs: Any) -> Response | Order:
+        pk = self.kwargs['pk']
+        order = Order.objects.filter(pk=pk).first()
+        if not order:
+            return Response({'message': 'The order does not exist'}, status=status.HTTP_404_NOT_FOUND)
+        return order
