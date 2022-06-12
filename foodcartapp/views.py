@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Sequence, Mapping
 
 from django.core.signing import Signer
 from django.http import JsonResponse
@@ -17,7 +17,7 @@ from foodcartapp.view_mixins import AllowOrderMixin
 class BannersListViews(ListAPIView):
     serializer_class = BannerSerializer
 
-    def get(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+    def get(self, request: Request, *args: Sequence, **kwargs: Mapping) -> Response:
         banners = Banner.objects.all()
         serializer = BannerSerializer(banners, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -25,7 +25,7 @@ class BannersListViews(ListAPIView):
 
 class ProductsListApiViews(APIView):
 
-    def get(self, request: Request, *args: Any, **kwargs: Any) -> JsonResponse:
+    def get(self, request: Request, *args: Sequence, **kwargs: Mapping) -> JsonResponse:
         products = Product.objects.select_related('category').available()
 
         dumped_products = []
@@ -57,7 +57,7 @@ class RegisterOrderViews(CreateAPIView):
     serializer_class = OrderSerializer
 
     @transaction.atomic
-    def post(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+    def post(self, request: Request, *args: Sequence, **kwargs: Mapping) -> Response:
         signer = Signer()
         serializer = OrderSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -87,24 +87,24 @@ class OrderDetailsView(AllowOrderMixin, RetrieveUpdateDestroyAPIView):
     serializer_class = OrderSerializer
     allowed_methods = ['get', 'patch', 'delete']
 
-    def patch(self, request: Request, *args: Any, ** kwargs: Any) -> Response:
+    def patch(self, request: Request, *args: Sequence, **kwargs: Mapping) -> Response:
         order = self.get_object()
         serializer = OrderSerializer(order, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def get(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+    def get(self, request: Request, *args: Sequence, **kwargs: Mapping) -> Response:
         order = self.get_object()
         serializer = OrderSerializer(order)
         return Response(serializer.data)
 
-    def delete(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+    def delete(self, request: Request, *args: Sequence, **kwargs: Mapping) -> Response:
         order = self.get_object()
         order.delete()
         return Response({'message': 'The order was deleted successfully!'}, status=status.HTTP_204_NO_CONTENT)
 
-    def get_object(self, **kwargs: Any) -> Response | Order:
+    def get_object(self, **kwargs: Mapping) -> Response | Order:
         pk = self.kwargs['pk']
         order = Order.objects.filter(pk=pk).first()
         if not order:
