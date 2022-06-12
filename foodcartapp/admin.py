@@ -127,10 +127,15 @@ class OrderAdmin(admin.ModelAdmin):
         'delivery_time',
     ]
     readonly_fields = ['create_time']
+    list_display = ['id', 'full_name', 'create_time']
 
     inlines = [
         OrderItemInline,
     ]
+
+    @admin.display()
+    def full_name(self, obj):
+        return f'{obj.firstname} {obj.lastname}'
 
     def response_change(self, request: HttpRequest, obj: Order) -> HttpResponseRedirect:
         response = super().response_change(request, obj)
