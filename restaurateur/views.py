@@ -1,10 +1,10 @@
 from http.client import HTTPResponse
-from typing import Any
+from typing import Any, Sequence, Mapping
 
 from django import forms
 from django.contrib.auth.models import User
 from django.db.models import F
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.views import View
 from django.urls import reverse_lazy
@@ -13,7 +13,7 @@ from django.urls import reverse
 
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import views as auth_views
-
+from django.views.generic import TemplateView
 
 from foodcartapp.models import Product, Restaurant, DeliveryLocation
 from foodcartapp.models import Order
@@ -72,29 +72,31 @@ def is_manager(user: User) -> bool:
     return user.is_staff
 
 
-@user_passes_test(is_manager, login_url='restaurateur:login')
-def view_products(request: HttpRequest) -> HTTPResponse:
-    restaurants = list(Restaurant.objects.order_by('name'))
-    products = list(Product.objects.prefetch_related('menu_items'))
+class ProductsView(TemplateView):
+    template_name = 'products_list.html'
 
-    default_availability = {restaurant.id: False for restaurant in restaurants}
-    products_with_restaurants = []
-    for product in products:
+    @user_passes_test(is_manager, login_url='restaurateur:login')
+    def get(self, request: HttpRequest, *args: Sequence, **kwargs: Mapping) -> HttpResponse:
+        restaurants = list(Restaurant.objects.order_by('name'))
+        products = list(Product.objects.prefetch_related('menu_items'))
 
-        availability = {
-            **default_availability,
-            **{item.restaurant_id: item.availability for item in product.menu_items.all()},
-        }
-        orderer_availability = [availability[restaurant.id] for restaurant in restaurants]
+        default_availability = {restaurant.id: False for restaurant in restaurants}
+        products_with_restaurants = []
+        for product in products:
+            availability = {
+                **default_availability,
+                **{item.restaurant_id: item.availability for item in product.menu_items.all()},
+            }
+            orderer_availability = [availability[restaurant.id] for restaurant in restaurants]
 
-        products_with_restaurants.append(
-            (product, orderer_availability),
-        )
+            products_with_restaurants.append(
+                (product, orderer_availability),
+            )
 
-    return render(request, template_name='products_list.html', context={
-        'products_with_restaurants': products_with_restaurants,
-        'restaurants': restaurants,
-    })
+        return HttpResponse(context={
+            'products_with_restaurants': products_with_restaurants,
+            'restaurants': restaurants,
+        })
 
 
 @user_passes_test(is_manager, login_url='restaurateur:login')

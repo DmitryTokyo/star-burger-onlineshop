@@ -6,9 +6,9 @@ from restaurateur import views
 app_name = 'restaurateur'
 
 urlpatterns = [
-    path('', lambda request: redirect('restaurateur:ProductsView')),
+    path('', lambda request: redirect('restaurateur:products_view')),
 
-    path('products/', views.view_products, name='ProductsView'),
+    path('products/', views.ProductsView.as_view(), name='products_view'),
 
     path('restaurants/', views.view_restaurants, name='RestaurantView'),
 
