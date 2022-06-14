@@ -162,7 +162,7 @@ class OrderItem(models.Model):
 class Banner(models.Model):
     src = models.ImageField('баннер', upload_to='banners/')
     title = models.CharField('название', max_length=200)
-    description = models.TextField('описание', null=True, blank=True)
+    description = models.TextField('описание', blank=True)
     banner_order = models.PositiveIntegerField(default=0, verbose_name='место баннера', db_index=True)
 
     class Meta:
