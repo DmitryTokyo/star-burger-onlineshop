@@ -48,4 +48,4 @@ flake8-absolute-import==1.0
 flake8-simplify==0.14.2
 scspell3k==2.2
 flake8-functions-names==0.0.6
-flake8-obey-import-goat==0.0.1
+flake8-obey-import-goat==0.1.1
