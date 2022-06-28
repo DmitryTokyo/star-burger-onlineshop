@@ -121,7 +121,7 @@ parcel --version
 Почти всё готово. Теперь запустите сборку фронтенда и не выключайте. Parcel будет работать в фоне и следить за изменениями в JS-коде:
 
 ```sh
-parcel watch bundles-src/index.js --dist-dir bundles --public-url="./"
+parcel watch bundles-src/index.js -d bundles --public-url="./"
 ```
 
 Дождитесь завершения первичной сборки. Это вполне может занять 10 и более секунд. О готовности вы узнаете по сообщению в консоли:
