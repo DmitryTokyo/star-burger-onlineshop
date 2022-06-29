@@ -6,7 +6,6 @@ import environ
 env = environ.Env()
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -143,11 +142,12 @@ USE_L10N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles/')
 
 INTERNAL_IPS = ['127.0.0.1']
 
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'assets'),
-    os.path.join(BASE_DIR, 'bundles'),
+    os.path.join(BASE_DIR, 'assets/'),
+    os.path.join(BASE_DIR, 'bundles/'),
 ]
