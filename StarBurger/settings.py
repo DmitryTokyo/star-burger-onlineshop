@@ -2,6 +2,7 @@ import os
 
 import dj_database_url
 import environ
+import rollbar
 
 env = environ.Env()
 
@@ -54,6 +55,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'rollbar.contrib.django.middleware.RollbarNotifierMiddleware',
+    'rollbar.contrib.django.middleware.RollbarNotifierMiddlewareExcluding404',
 ]
 
 REST_FRAMEWORK = {
@@ -61,6 +64,12 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
     ),
+}
+
+ROLLBAR = {
+    'access_token': env('ROLLBAR_ACCESS_TOKEN'),
+    'environment': env('ROLLBAR_ENVIRONMENT', default='production'),
+    'root': BASE_DIR,
 }
 
 ROOT_URLCONF = 'StarBurger.urls'
@@ -151,3 +160,5 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'assets/'),
     os.path.join(BASE_DIR, 'bundles/'),
 ]
+
+rollbar.init(**ROLLBAR)
