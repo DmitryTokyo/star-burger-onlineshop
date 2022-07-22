@@ -9,10 +9,8 @@ env = environ.Env()
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env('SECRET_KEY', default='dev_key')
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool('DEBUG', default=False)
 
 YANDEX_MAP_APIKEY = env('YANDEX_MAP_APIKEY')
@@ -72,6 +70,7 @@ ROLLBAR = {
     'branch': 'master',
     'root': BASE_DIR,
 }
+rollbar.init(**ROLLBAR)
 
 ROOT_URLCONF = 'StarBurger.urls'
 
@@ -161,5 +160,3 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'assets/'),
     os.path.join(BASE_DIR, 'bundles/'),
 ]
-
-rollbar.init(**ROLLBAR)
