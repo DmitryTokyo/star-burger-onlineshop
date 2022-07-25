@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='order',
             name='payment_method',
-            field=models.CharField(choices=[('CA', 'Наличные'), ('CC', 'Электронно')], default='Электронно', max_length=2, verbose_name='Тип оплаты'),
+            field=models.CharField(choices=[('CA', 'Наличные'), ('CC', 'Электронно')], default='Электронно', max_length=20, verbose_name='Тип оплаты'),
         ),
     ]

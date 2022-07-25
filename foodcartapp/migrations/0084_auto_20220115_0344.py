@@ -15,12 +15,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='order',
             name='order_status',
-            field=enumfields.fields.EnumField(default='необработанный', enum=foodcartapp.enums.OrderStatus, max_length=10, verbose_name='статус заказа'),
+            field=enumfields.fields.EnumField(default='необработанный', enum=foodcartapp.enums.OrderStatus, max_length=20, verbose_name='статус заказа'),
         ),
         migrations.AddField(
             model_name='order',
             name='payment_method',
-            field=enumfields.fields.EnumField(default='наличные', enum=foodcartapp.enums.PaymentMethod, max_length=4, verbose_name='метод оплаты'),
+            field=enumfields.fields.EnumField(default='cash', enum=foodcartapp.enums.PaymentMethod, max_length=20, verbose_name='метод оплаты'),
             preserve_default=False,
         ),
         migrations.AddIndex(
