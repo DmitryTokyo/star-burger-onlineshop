@@ -42,7 +42,7 @@ python3.10 -m venv env
 Активируйте его. На разных операционных системах это делается разными командами:
 
 - Windows: `.\env\Scripts\activate`
-- MacOS/Linux: `source env/bin/activate`
+- MacOS/Linux: `source venv/bin/activate`
 
 Перейдите в каталог проекта:
 
